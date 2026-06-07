@@ -1,0 +1,81 @@
+{
+  "ReportId": "bny-mellon-global-infrastructure-income-etf",
+  "ReportType": "SingleFund",
+  "Publisher": "BNY Mellon",
+  "Version": 1,
+  "CreatedAt": "2026-06-10T13:46:25.727908Z",
+  "ReportLayout": {
+    "TableConfig": {
+      "ColumnGroups": [
+        {
+          "Fields": [
+            {
+              "Field": "SecurityName",
+              "HeaderText": "Description",
+              "IsHeaderTextVisible": true,
+              "Index": 0,
+              "LeftX": 38,
+              "RightX": 167
+            },
+            {
+              "Field": "Shares",
+              "HeaderText": "Shares",
+              "IsHeaderTextVisible": true,
+              "Index": 1,
+              "LeftX": 470,
+              "RightX": 509
+            },
+            {
+              "Field": "MarketValue",
+              "HeaderText": "Value ($)",
+              "IsHeaderTextVisible": true,
+              "Index": 2,
+              "LeftX": 522,
+              "RightX": 569
+            }
+          ],
+          "StartX": 38,
+          "EndX": 569
+        }
+      ]
+    },
+    "ReportDateRegex": "January\\s\u002B\\d{1,2},\\s*\\d{4}\\s*\\(Unaudited\\)",
+    "SecurityTypePattern": {
+      "Regex": "^Equity Securities\\s*-\\s*([\\w\\s]\u002B?)\\s*(?:\u2014\\s*[\\d.]\u002B%)?\\s*$",
+      "Example": "Equity Securities - Common Stocks \u2014 98.8%",
+      "IsBold": true,
+      "SpansFullWidth": true
+    },
+    "SectorPattern": null,
+    "CountryPattern": {
+      "Regex": "^([A-Za-z][A-Za-z\\s]\u002B?)\\s*\u2014\\s*[\\d.]\u002B%\\s*$",
+      "Example": "United States \u2014 42.4%",
+      "IsBold": true,
+      "SpansFullWidth": true
+    },
+    "SecurityNameCleaningPattern": null,
+    "FootnotePattern": "\\(([a-z])\\)",
+    "SubtotalRowPattern": "^Total\\s\u002B(Equity Securities|Investments|Investment Companies)\\b",
+    "CurrencySymbol": "$",
+    "NegativeNotation": "Parentheses",
+    "ValidationTolerance": 0.02
+  },
+  "Funds": [
+    {
+      "FundId": "bny-mellon-global-infrastructure-income-etf",
+      "DisplayName": "BNY Mellon Global Infrastructure Income ETF",
+      "FundNameRegex": "BNY Mellon Global Infrastructure Income ETF",
+      "ScheduleLocator": {
+        "StartPattern": "Equity Securities\\s*-\\s*Common Stocks",
+        "TerminationPattern": "^Total Investments\\s*\\(cost\\s*\\$[\\d,]\u002B\\)",
+        "PageHint": 1
+      },
+      "Overrides": null
+    }
+  ],
+  "Issues": [
+    "Country header rows share a similar pattern to security type rows; countryPattern regex may need tuning if future reports include ambiguous section headers.",
+    "Investment Companies section (Money Market Fund) uses a slightly different column layout with an additional 1-Day Yield (%) column not present in the equity section; extraction of that section may require a layout override."
+  ],
+  "ConfidenceScore": 0.93
+}

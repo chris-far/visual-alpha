@@ -1,0 +1,112 @@
+{
+  "ReportId": "blackrock-series-international-fund",
+  "ReportType": "SingleFund",
+  "Publisher": "BlackRock",
+  "Version": 1,
+  "CreatedAt": "2026-06-10T13:20:48.795635Z",
+  "ReportLayout": {
+    "TableConfig": {
+      "ColumnGroups": [
+        {
+          "Fields": [
+            {
+              "Field": "SecurityName",
+              "HeaderText": "Security",
+              "IsHeaderTextVisible": true,
+              "Index": 0,
+              "LeftX": 17,
+              "RightX": 171
+            },
+            {
+              "Field": "Shares",
+              "HeaderText": "Shares",
+              "IsHeaderTextVisible": true,
+              "Index": 1,
+              "LeftX": 200,
+              "RightX": 230
+            },
+            {
+              "Field": "MarketValue",
+              "HeaderText": "Value",
+              "IsHeaderTextVisible": true,
+              "Index": 2,
+              "LeftX": 251,
+              "RightX": 285
+            }
+          ],
+          "StartX": 17,
+          "EndX": 285
+        },
+        {
+          "Fields": [
+            {
+              "Field": "SecurityName",
+              "HeaderText": "Security",
+              "IsHeaderTextVisible": true,
+              "Index": 0,
+              "LeftX": 307,
+              "RightX": 461
+            },
+            {
+              "Field": "Shares",
+              "HeaderText": "Shares",
+              "IsHeaderTextVisible": true,
+              "Index": 1,
+              "LeftX": 486,
+              "RightX": 519
+            },
+            {
+              "Field": "MarketValue",
+              "HeaderText": "Value",
+              "IsHeaderTextVisible": true,
+              "Index": 2,
+              "LeftX": 541,
+              "RightX": 574
+            }
+          ],
+          "StartX": 307,
+          "EndX": 574
+        }
+      ]
+    },
+    "ReportDateRegex": "(?:August|May|February|November)\\s\u002B\\d{1,2},\\s*\\d{4}",
+    "SecurityTypePattern": {
+      "Regex": "^(Common Stocks|Short-Term Securities|Money Market Funds)\\s*$",
+      "Example": "Common Stocks",
+      "IsBold": true,
+      "SpansFullWidth": true
+    },
+    "SectorPattern": null,
+    "CountryPattern": {
+      "Regex": "^([A-Za-z][A-Za-z\\s]\u002B?)\\s*[\u2014\\-]\\s*[\\d.]\u002B%\\s*$",
+      "Example": "Canada \u2014 6.5%",
+      "IsBold": false,
+      "SpansFullWidth": false
+    },
+    "SecurityNameCleaningPattern": "(\\s*\\.){2,}\\s*$",
+    "FootnotePattern": "\\([a-z]\\)",
+    "SubtotalRowPattern": "^Total\\s\u002B(Long-Term Investments|Short-Term Securities|Investments|Net Assets)\\b",
+    "CurrencySymbol": "$",
+    "NegativeNotation": "Parentheses",
+    "ValidationTolerance": 0.02
+  },
+  "Funds": [
+    {
+      "FundId": "blackrock-international",
+      "DisplayName": "BlackRock International Fund",
+      "FundNameRegex": "BlackRock\\s\u002BInternational\\s\u002BFund",
+      "ScheduleLocator": {
+        "StartPattern": "Common Stocks",
+        "TerminationPattern": "^Net Assets\\s*[\u2014\\-]\\s*100\\.0%",
+        "PageHint": 2
+      },
+      "Overrides": null
+    }
+  ],
+  "Issues": [
+    "The table uses a two-column layout side by side on the page; both column groups share identical headers (Security, Shares, Value). Extraction should process left group first, then right group per page.",
+    "Country allocation rows (e.g. \u0027Canada \u2014 6.5%\u0027) act as country context headers but are not standard bold section headers; the countryPattern regex should be validated against all country names in future editions.",
+    "Footnote markers (a), (b) appear inline in security names (e.g. money market fund rows); footnotePattern covers these but downstream cleaning should be verified."
+  ],
+  "ConfidenceScore": 0.92
+}

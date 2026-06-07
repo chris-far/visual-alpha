@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/Tests/">
+    <Project Path="tests/VisualAlpha.FundLens.Api.Tests/VisualAlpha.FundLens.Api.Tests.csproj" />
+    <Project Path="tests/VisualAlpha.FundLens.Extraction.Tests/VisualAlpha.FundLens.Extraction.Tests.csproj" />
+    <Project Path="tests/VisualAlpha.FundLens.Ingestion.Tests/VisualAlpha.FundLens.Ingestion.Tests.csproj" />
+    <Project Path="tests/VisualAlpha.FundLens.Validation.Tests/VisualAlpha.FundLens.Validation.Tests.csproj" />
+  </Folder>
+  <Project Path="src/VisualAlpha.FundLens.Api/VisualAlpha.FundLens.Api.csproj" />
+  <Project Path="src/VisualAlpha.FundLens.Core/VisualAlpha.FundLens.Core.csproj" />
+  <Project Path="src/VisualAlpha.FundLens.Extraction/VisualAlpha.FundLens.Extraction.csproj" />
+  <Project Path="src/VisualAlpha.FundLens.Ingestion/VisualAlpha.FundLens.Ingestion.csproj" />
+  <Project Path="src/VisualAlpha.FundLens.Validation/VisualAlpha.FundLens.Validation.csproj" />
+</Solution>
