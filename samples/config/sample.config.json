@@ -1,0 +1,120 @@
+{
+  "ReportId": "fidelity-500-index",
+  "ReportType": "SingleFund",
+  "Publisher": "Fidelity Management \u0026 Research Company LLC",
+  "Version": 1,
+  "CreatedAt": "2026-06-10T13:33:43.549156Z",
+  "ReportLayout": {
+    "TableConfig": {
+      "ColumnGroups": [
+        {
+          "Fields": [
+            {
+              "Field": "SecurityName",
+              "HeaderText": null,
+              "IsHeaderTextVisible": false,
+              "Index": 0,
+              "LeftX": 26,
+              "RightX": 189
+            },
+            {
+              "Field": "Shares",
+              "HeaderText": "Shares",
+              "IsHeaderTextVisible": true,
+              "Index": 1,
+              "LeftX": 199,
+              "RightX": 238
+            },
+            {
+              "Field": "MarketValue",
+              "HeaderText": "Value ($)",
+              "IsHeaderTextVisible": true,
+              "Index": 2,
+              "LeftX": 245,
+              "RightX": 287
+            }
+          ],
+          "StartX": 26,
+          "EndX": 287
+        },
+        {
+          "Fields": [
+            {
+              "Field": "SecurityName",
+              "HeaderText": null,
+              "IsHeaderTextVisible": false,
+              "Index": 0,
+              "LeftX": 316,
+              "RightX": 437
+            },
+            {
+              "Field": "Shares",
+              "HeaderText": "Shares",
+              "IsHeaderTextVisible": true,
+              "Index": 1,
+              "LeftX": 490,
+              "RightX": 524
+            },
+            {
+              "Field": "MarketValue",
+              "HeaderText": "Value ($)",
+              "IsHeaderTextVisible": true,
+              "Index": 2,
+              "LeftX": 535,
+              "RightX": 577
+            }
+          ],
+          "StartX": 316,
+          "EndX": 577
+        }
+      ]
+    },
+    "ReportDateRegex": "(?:As of |February|Year ended)\\s\u002B\\w\u002B\\s\u002B\\d{1,2},?\\s*\\d{4}",
+    "SecurityTypePattern": {
+      "Regex": "^(Common Stocks|U\\.S\\. Treasury Obligations|Money Market Funds)(?:\\s*[\u2013-]\\s*[\\d.]\u002B%)?\\s*$",
+      "Example": "Common Stocks \u2013 99.9%",
+      "IsBold": false,
+      "SpansFullWidth": true
+    },
+    "SectorPattern": {
+      "Regex": "^([A-Z][A-Za-z \u0026]\u002B(?:\\s*-\\s*[\\d.]\u002B%)?)",
+      "Example": "Communication Services - 10.5%",
+      "IsBold": false,
+      "SpansFullWidth": false
+    },
+    "CountryPattern": {
+      "Regex": "^(NETHERLANDS|SWITZERLAND|UNITED STATES)(?:\\s*[-\u2013]\\s*[\\d.]\u002B%)?\\s*$",
+      "Example": "UNITED STATES - 99.7%",
+      "IsBold": false,
+      "SpansFullWidth": true
+    },
+    "SecurityNameCleaningPattern": "(\\s*\\.){2,}\\s*$",
+    "FootnotePattern": "\\([a-z]\\)",
+    "SubtotalRowPattern": "^TOTAL\\s\u002B[A-Z\\s]\u002B$",
+    "CurrencySymbol": "$",
+    "NegativeNotation": "Parentheses",
+    "ValidationTolerance": 0.02
+  },
+  "Funds": [
+    {
+      "FundId": "fidelity-500-index",
+      "DisplayName": "Fidelity\u00AE 500 Index Fund",
+      "FundNameRegex": "Fidelity[\u00AE\\s]*500 Index Fund",
+      "ScheduleLocator": {
+        "StartPattern": "NETHERLANDS\\s*-\\s*[\\d.]\u002B%",
+        "TerminationPattern": "TOTAL\\s\u002BINVESTMENT\\s\u002BIN\\s\u002BSECURITIES",
+        "PageHint": 4
+      },
+      "Overrides": null
+    }
+  ],
+  "Issues": [
+    "The schedule of investments uses a two-column layout per page; both column groups share identical field structure.",
+    "Security type rows (e.g. \u0027Common Stocks \u2013 99.9%\u0027) span the full page width and serve as top-level grouping.",
+    "Country rows (e.g. \u0027UNITED STATES - 99.7%\u0027) appear as section headers within the security type group.",
+    "Sector rows (e.g. \u0027Communication Services - 10.5%\u0027) appear as sub-section headers within the country group.",
+    "Sub-sector rows (e.g. \u0027Diversified Telecommunication Services \u2013 0.9%\u0027) also appear; these are not separately modelled and may require post-processing.",
+    "The sectorPattern and countryPattern share similar structure; downstream extraction should apply countryPattern first to distinguish country vs sector headers."
+  ],
+  "ConfidenceScore": 0.92
+}
