@@ -52,5 +52,14 @@ public sealed class FileSystemConfigStore(IOptions<FileSystemConfigStoreOptions>
         return configs;
     }
 
+    public Task<bool> DeleteAsync(string reportId)
+    {
+        var path = ConfigPath(reportId);
+        if (!File.Exists(path)) return Task.FromResult(false);
+        File.Delete(path);
+        log.LogInformation("Config deleted: {Path}", path);
+        return Task.FromResult(true);
+    }
+
     private string ConfigPath(string reportId) => Path.Combine(_basePath, $"{reportId}.config.json");
 }

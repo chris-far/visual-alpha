@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fund Lens</title>
+    <link rel="stylesheet" href="styles.css" />
+    <!-- Tabler icons (same set used in the mockup) -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" />
+</head>
+<body>
+
+<div class="shell">
+
+    <!-- ── Sidebar ─────────────────────────────────────────── -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <i class="ti ti-zoom-scan" aria-hidden="true"></i> Fund Lens
+        </div>
+        <nav>
+            <button class="nav-item active" data-tab="dashboard">
+                <i class="ti ti-layout-dashboard" aria-hidden="true"></i> Dashboard
+            </button>
+            <button class="nav-item" data-tab="onboarding">
+                <i class="ti ti-wand" aria-hidden="true"></i> Onboarding
+            </button>
+            <button class="nav-item" data-tab="config">
+                <i class="ti ti-settings" aria-hidden="true"></i> Config Editor
+            </button>
+            <button class="nav-item" data-tab="extract">
+                <i class="ti ti-upload" aria-hidden="true"></i> Extract
+            </button>
+        </nav>
+    </aside>
+
+    <!-- ── Main content ──────────────────────────────────────── -->
+    <div class="main">
+
+        <!-- ══ DASHBOARD ══ -->
+        <section id="tab-dashboard" class="tab active">
+            <header class="topbar">
+                <h2>Dashboard</h2>
+                <button class="btn primary" id="btn-goto-extract">
+                    <i class="ti ti-wand" aria-hidden="true"></i> Onboard Report
+                </button>
+            </header>
+            <div class="content">
+                <div class="banner banner-success" id="dashboard-banner" hidden>
+                    <i class="ti ti-circle-check" aria-hidden="true"></i>
+                    <span id="dashboard-banner-text"></span>
+                </div>
+                <div class="metrics" id="dashboard-metrics">
+                    <div class="metric"><div class="metric-label">Active reports</div><div class="metric-value" id="m-total">—</div></div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        Onboarded reports
+                        <span class="panel-hint">click a row to open in config editor</span>
+                    </div>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Publisher</th><th>Report ID</th><th>Onboarded</th><th></th>
+                        </tr>
+                        </thead>
+                        <tbody id="reports-tbody">
+                        <tr><td colspan="4" class="empty">Loading…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ══ ONBOARDING ══ -->
+        <section id="tab-onboarding" class="tab">
+            <header class="topbar">
+                <h2>Onboarding</h2>
+            </header>
+            <div class="content">
+                <div class="panel" id="upload-panel">
+                    <div class="panel-header">Upload PDF Report</div>
+                    <div class="drop-zone" id="drop-zone">
+                        <i class="ti ti-cloud-upload" aria-hidden="true"></i>
+                        <p>Drag &amp; drop a PDF here, or</p>
+                        <label class="btn" for="file-input">Browse File</label>
+                        <input type="file" id="file-input" accept="application/pdf" hidden />
+                        <p class="drop-filename" id="drop-filename"></p>
+                    </div>
+                    <div class="upload-controls">
+                        <button class="btn primary" id="btn-onboarding" disabled>
+                            <i class="ti ti-player-play" aria-hidden="true"></i> Run Onboarding
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Progress indicator (hidden until running) -->
+                <div class="panel" id="progress-panel" hidden>
+                    <div class="panel-header">Ingesting…</div>
+                    <div class="progress-bar-track"><div class="progress-bar" id="progress-bar"></div></div>
+                    <p class="progress-status" id="progress-status">Ingesting PDF…</p>
+                </div>
+
+                <!-- Results (hidden until done) -->
+                <div class="panel" id="results-panel" hidden>
+                    <div class="panel-header">
+                        Extracted Holdings
+                        <div style="display:flex;gap:8px">
+                            <button class="btn" id="btn-dl-json">Download JSON</button>
+                            <button class="btn" id="btn-dl-csv">Download CSV</button>
+                        </div>
+                    </div>
+                    <!-- Validation banner -->
+                    <div id="validation-banner" hidden></div>
+                    <div class="search-bar">
+                        <i class="ti ti-search" aria-hidden="true"></i>
+                        <input type="text" id="holdings-search" placeholder="Filter by name, sector, country…" />
+                    </div>
+                    <div class="table-scroll holdings-scroll">
+                        <table id="holdings-table">
+                            <thead>
+                            <tr>
+                                <th>Security name</th><th>Type</th><th>Sector</th>
+                                <th>Country</th><th>Shares</th><th>Principal</th>
+                                <th class="num">Market value</th>
+                            </tr>
+                            </thead>
+                            <tbody id="holdings-tbody"></tbody>
+                        </table>
+                    </div>
+                    <div class="table-footer" id="holdings-count"></div>
+                    <div class="onboarding-actions">
+                        <button class="btn" id="btn-cancel-onboarding">Cancel</button>
+                        <button class="btn primary" id="btn-review-onboarding">
+                            <i class="ti ti-settings" aria-hidden="true"></i> Review Config
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ══ EXTRACT ══ -->
+        <section id="tab-extract" class="tab">
+            <header class="topbar">
+                <h2>Extract</h2>
+                <button class="btn" id="ex-btn-clear" hidden>Clear</button>
+            </header>
+            <div class="content">
+                <div class="panel" id="ex-upload-panel">
+                    <div class="panel-header">Upload PDF for a Known Report</div>
+                    <div class="drop-zone" id="ex-drop-zone">
+                        <i class="ti ti-cloud-upload" aria-hidden="true"></i>
+                        <p>Drag &amp; drop a PDF here, or</p>
+                        <label class="btn" for="ex-file-input">Browse File</label>
+                        <input type="file" id="ex-file-input" accept="application/pdf" hidden />
+                        <p class="drop-filename" id="ex-drop-filename"></p>
+                    </div>
+                    <div class="upload-controls">
+                        <label>Report
+                            <select id="ex-report-select">
+                                <option value="">Select a report…</option>
+                            </select>
+                        </label>
+                        <button class="btn primary" id="btn-extract" disabled>
+                            <i class="ti ti-player-play" aria-hidden="true"></i> Run Extraction
+                        </button>
+                    </div>
+                </div>
+
+                <div class="panel" id="ex-progress-panel" hidden>
+                    <div class="panel-header">Extracting…</div>
+                    <div class="progress-bar-track"><div class="progress-bar" id="ex-progress-bar"></div></div>
+                    <p class="progress-status" id="ex-progress-status"></p>
+                </div>
+
+                <div id="ex-results-container"></div>
+            </div>
+        </section>
+
+        <!-- ══ CONFIG EDITOR ══ -->
+        <section id="tab-config" class="tab">
+            <header class="topbar">
+                <h2>Config Editor</h2>
+                <div style="display:flex;gap:8px;align-items:center">
+                    <select id="config-report-select"></select>
+                    <button class="btn" id="btn-cancel-config" hidden>Cancel</button>
+                    <button class="btn" id="btn-clear-config" hidden>Clear</button>
+                    <button class="btn primary" id="btn-save-config" disabled>Update Report</button>
+                </div>
+            </header>
+            <div class="content">
+                <div class="banner banner-success" id="config-banner" hidden>
+                    <i class="ti ti-circle-check" aria-hidden="true"></i>
+                    <span id="config-banner-text"></span>
+                </div>
+                <div class="panel">
+                    <div class="panel-header">
+                        <span id="config-panel-title">Column Visualizer</span>
+                        <div class="toggle-group">
+                            <button class="toggle-btn active" id="btn-view-viz">Column Layout</button>
+                            <button class="toggle-btn" id="btn-view-json">Raw JSON</button>
+                        </div>
+                    </div>
+                    <div id="config-viz-pane">
+                        <div class="config-viz" id="config-viz">
+                            <p class="empty">Select a report above to visualise its config.</p>
+                        </div>
+                    </div>
+                    <div id="config-json-pane" hidden>
+                        <textarea id="config-editor" spellcheck="false"
+                                  placeholder="Select a report to load its config…"></textarea>
+                    </div>
+                </div>
+                <!-- Funds table -->
+                <div class="panel" id="patterns-panel" hidden>
+                    <div class="panel-header">Funds</div>
+                    <table id="patterns-table">
+                        <thead>
+                        <tr><th class="fund-toggle-col"></th><th>Fund ID</th><th>Display Name</th></tr>
+                        </thead>
+                        <tbody id="patterns-tbody"></tbody>
+                    </table>
+                </div>
+                <!-- Regex pattern editor -->
+                <div class="panel" id="regex-panel" hidden>
+                    <div class="panel-header">Patterns</div>
+                    <div id="regex-editor-panel" class="regex-editor">
+                        <p class="empty">Select a report above to edit patterns.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ══ RUN HISTORY ══ -->
+    </div><!-- /main -->
+</div><!-- /shell -->
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -16,13 +16,13 @@ public sealed record ReportLayoutConfig
             .ToArray();
     
     public TableConfig? TableConfig { get; init; }
-    public string? ReportDateRegex { get; init; }
+    public HeaderPattern? ReportDatePattern { get; init; }
     public HeaderPattern? SecurityTypePattern { get; init; }
     public HeaderPattern? SectorPattern { get; init; }
     public HeaderPattern? CountryPattern { get; init; }
-    public string? SecurityNameCleaningPattern { get; init; }
-    public string? FootnotePattern { get; init; }
-    public string? SubtotalRowPattern { get; init; }
+    public HeaderPattern? SecurityNameCleaningPattern { get; init; }
+    public HeaderPattern? FootnotePattern { get; init; }
+    public HeaderPattern? SubtotalRowPattern { get; init; }
     public string? CurrencySymbol { get; init; }
     public NegativeNotation? NegativeNotation { get; init; }
     public double? ValidationTolerance { get; init; }

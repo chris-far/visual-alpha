@@ -4,7 +4,7 @@ public sealed record FundScheduleConfig
 {
     public required string FundId { get; init; }
     public required string DisplayName { get; init; }
-    public string? FundNameRegex { get; init; }
+    public HeaderPattern? FundNamePattern { get; init; }
     public required ScheduleLocator ScheduleLocator { get; init; }
 
     /// <summary>

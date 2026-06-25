@@ -8,4 +8,5 @@ namespace VisualAlpha.FundLens.Core.Domain;
 public sealed record TableConfig
 {
     public List<ColumnConfig> ColumnGroups { get; init; } = [];
+    public double? TotalWidth { get; init; }
 }

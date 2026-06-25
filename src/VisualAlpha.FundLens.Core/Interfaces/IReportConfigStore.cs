@@ -7,4 +7,5 @@ public interface IReportConfigStore
     Task<ReportConfig?> GetAsync(string reportId);
     Task SaveAsync(ReportConfig config);
     Task<IReadOnlyList<ReportConfig>> GetAllAsync();
+    Task<bool> DeleteAsync(string reportId);
 }

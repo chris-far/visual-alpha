@@ -39,23 +39,28 @@
         }
       ]
     },
-    "ReportDateRegex": "As of \\w\u002B \\d{1,2},?\\s*\\d{4}",
+    "ReportDatePattern": {
+      "Regex": "As of \\w+ \\d{1,2},?\\s*\\d{4}",
+      "Example": "As of October 31, 2024"
+    },
     "SecurityTypePattern": {
-      "Regex": "^(Common Stocks|Preferred Stocks|Temporary Cash Investments|Money Market Fund)\\s*(?:\\([\\d.]\u002B%\\))?",
-      "Example": "Common Stocks (93.1%)",
-      "IsBold": false,
-      "SpansFullWidth": true
+      "Regex": "^(Common Stocks|Preferred Stocks|Temporary Cash Investments|Money Market Fund)\\s*(?:\\([\\d.]+%\\))?",
+      "Example": "Common Stocks (93.1%)"
     },
     "SectorPattern": null,
     "CountryPattern": {
-      "Regex": "^([A-Za-z][A-Za-z ]\u002B?)\\s*\\([\\d.]\u002B%\\)\\s*$",
-      "Example": "Brazil (5.9%)",
-      "IsBold": false,
-      "SpansFullWidth": true
+      "Regex": "^([A-Za-z][A-Za-z ]+?)\\s*\\([\\d.]+%\\)\\s*$",
+      "Example": "Brazil (5.9%)"
     },
     "SecurityNameCleaningPattern": null,
-    "FootnotePattern": "^[\\*\\d,]\u002B$|^[\\*]\u002B|^\\d\u002B$",
-    "SubtotalRowPattern": "^Total\\s\u002B(Common Stocks|Preferred Stocks|Temporary Cash Investments|Investments|Preferred|Money Market Fund)\\b",
+    "FootnotePattern": {
+      "Regex": "^[\\*\\d,]+$|^[\\*]+|^\\d+$",
+      "Example": "*"
+    },
+    "SubtotalRowPattern": {
+      "Regex": "^Total\\s+(Common Stocks|Preferred Stocks|Temporary Cash Investments|Investments|Preferred|Money Market Fund)\\b",
+      "Example": "Total Common Stocks"
+    },
     "CurrencySymbol": "$",
     "NegativeNotation": "Parentheses",
     "ValidationTolerance": 0.02
@@ -63,19 +68,28 @@
   "Funds": [
     {
       "FundId": "vanguard-emerging-markets-select-stock",
-      "DisplayName": "Vanguard\u00AE Emerging Markets Select Stock Fund",
-      "FundNameRegex": "Vanguard[\u00AE\\s]\u002BEmerging Markets Select Stock Fund",
+      "DisplayName": "Vanguard® Emerging Markets Select Stock Fund",
       "ScheduleLocator": {
-        "StartPattern": "Common Stocks\\s*\\([\\d.]\u002B%\\)",
-        "TerminationPattern": "^Total Investments\\s*\\([\\d.]\u002B%\\)",
+        "StartPattern": {
+          "Regex": "Common Stocks\\s*\\([\\d.]+%\\)",
+          "Example": "Common Stocks (93.1%)"
+        },
+        "TerminationPattern": {
+          "Regex": "^Total Investments\\s*\\([\\d.]+%\\)",
+          "Example": "Total Investments (93.1%)"
+        },
         "PageHint": 1
       },
-      "Overrides": null
+      "Overrides": null,
+      "FundNamePattern": {
+        "Regex": "Vanguard[®\\s]+Emerging Markets Select Stock Fund",
+        "Example": "Vanguard® Emerging Markets Select Stock Fund"
+      }
     }
   ],
   "Issues": [
     "Header text for Shares and MarketValue columns spans two lines in the PDF; headerText values reflect merged content as best inferred from layout.",
-    "Country rows use the same parenthetical-percentage pattern as security type rows; regex disambiguation relies on known country names vs. asset class names \u2014 may require post-processing logic.",
+    "Country rows use the same parenthetical-percentage pattern as security type rows; regex disambiguation relies on known country names vs. asset class names — may require post-processing logic.",
     "Footnote markers (* and superscript digits) appear inline with security names in the raw PDF text; footnotePattern strips standalone markers but inline stripping may need additional cleaning logic.",
     "Russia section holdings have zero market value (Level 3 / unobservable inputs); these rows are valid holdings and should not be suppressed by subtotalRowPattern."
   ],

@@ -18,9 +18,9 @@ public sealed class RowParser(ReportLayoutConfig layout)
     private readonly Regex? _securityTypePattern = Compile(layout.SecurityTypePattern);
     private readonly Regex? _sectorPattern = Compile(layout.SectorPattern);
     private readonly Regex? _countryPattern = Compile(layout.CountryPattern);
-    private readonly Regex? _totalRowPattern = Compile(layout.SubtotalRowPattern);
-    private readonly Regex? _footnoteMarker = Compile(layout.FootnotePattern, RegexOptions.Compiled);
-    private readonly Regex? _securityNameCleaning = Compile(layout.SecurityNameCleaningPattern);
+    private readonly Regex? _totalRowPattern = Compile(layout.SubtotalRowPattern?.Regex);
+    private readonly Regex? _footnoteMarker = Compile(layout.FootnotePattern?.Regex, RegexOptions.Compiled);
+    private readonly Regex? _securityNameCleaning = Compile(layout.SecurityNameCleaningPattern?.Regex);
     
     public HoldingRecord? TryParseRow(
         Dictionary<FieldType, string> mapped,

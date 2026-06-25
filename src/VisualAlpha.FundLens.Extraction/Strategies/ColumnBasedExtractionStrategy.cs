@@ -24,9 +24,9 @@ public sealed class ColumnBasedExtractionStrategy(ILogger<ColumnBasedExtractionS
         var parsers = columnGroups.Select(_ => new RowParser(layout)).ToList();
         var holdings = new List<HoldingRecord>();
 
-        var startRegex = new Regex(locator.StartPattern, RegexOptions.IgnoreCase);
-        var terminationRegex = locator.TerminationPattern is { Length: > 0 }
-            ? new Regex(locator.TerminationPattern, RegexOptions.IgnoreCase)
+        var startRegex = new Regex(locator.StartPattern.Regex!, RegexOptions.IgnoreCase);
+        var terminationRegex = locator.TerminationPattern?.Regex is { Length: > 0 }
+            ? new Regex(locator.TerminationPattern.Regex!, RegexOptions.IgnoreCase)
             : null;
 
         var state = new ScheduleState { Started = false, Terminated = false };

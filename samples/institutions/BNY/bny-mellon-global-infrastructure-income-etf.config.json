@@ -39,23 +39,28 @@
         }
       ]
     },
-    "ReportDateRegex": "January\\s\u002B\\d{1,2},\\s*\\d{4}\\s*\\(Unaudited\\)",
+    "ReportDatePattern": {
+      "Regex": "January\\s+\\d{1,2},\\s*\\d{4}\\s*\\(Unaudited\\)",
+      "Example": "January 31, 2024 (Unaudited)"
+    },
     "SecurityTypePattern": {
-      "Regex": "^Equity Securities\\s*-\\s*([\\w\\s]\u002B?)\\s*(?:\u2014\\s*[\\d.]\u002B%)?\\s*$",
-      "Example": "Equity Securities - Common Stocks \u2014 98.8%",
-      "IsBold": true,
-      "SpansFullWidth": true
+      "Regex": "^Equity Securities\\s*-\\s*([\\w\\s]+?)\\s*(?:—\\s*[\\d.]+%)?\\s*$",
+      "Example": "Equity Securities - Common Stocks — 98.8%"
     },
     "SectorPattern": null,
     "CountryPattern": {
-      "Regex": "^([A-Za-z][A-Za-z\\s]\u002B?)\\s*\u2014\\s*[\\d.]\u002B%\\s*$",
-      "Example": "United States \u2014 42.4%",
-      "IsBold": true,
-      "SpansFullWidth": true
+      "Regex": "^([A-Za-z][A-Za-z\\s]+?)\\s*—\\s*[\\d.]+%\\s*$",
+      "Example": "United States — 42.4%"
     },
     "SecurityNameCleaningPattern": null,
-    "FootnotePattern": "\\(([a-z])\\)",
-    "SubtotalRowPattern": "^Total\\s\u002B(Equity Securities|Investments|Investment Companies)\\b",
+    "FootnotePattern": {
+      "Regex": "\\(([a-z])\\)",
+      "Example": "(a)"
+    },
+    "SubtotalRowPattern": {
+      "Regex": "^Total\\s+(Equity Securities|Investments|Investment Companies)\\b",
+      "Example": "Total Equity Securities"
+    },
     "CurrencySymbol": "$",
     "NegativeNotation": "Parentheses",
     "ValidationTolerance": 0.02
@@ -64,13 +69,22 @@
     {
       "FundId": "bny-mellon-global-infrastructure-income-etf",
       "DisplayName": "BNY Mellon Global Infrastructure Income ETF",
-      "FundNameRegex": "BNY Mellon Global Infrastructure Income ETF",
       "ScheduleLocator": {
-        "StartPattern": "Equity Securities\\s*-\\s*Common Stocks",
-        "TerminationPattern": "^Total Investments\\s*\\(cost\\s*\\$[\\d,]\u002B\\)",
+        "StartPattern": {
+          "Regex": "Equity Securities\\s*-\\s*Common Stocks",
+          "Example": "Equity Securities - Common Stocks"
+        },
+        "TerminationPattern": {
+          "Regex": "^Total Investments\\s*\\(cost\\s*\\$[\\d,]+\\)",
+          "Example": "Total Investments (cost $123,456,789)"
+        },
         "PageHint": 1
       },
-      "Overrides": null
+      "Overrides": null,
+      "FundNamePattern": {
+        "Regex": "BNY Mellon Global Infrastructure Income ETF",
+        "Example": "BNY Mellon Global Infrastructure Income ETF"
+      }
     }
   ],
   "Issues": [

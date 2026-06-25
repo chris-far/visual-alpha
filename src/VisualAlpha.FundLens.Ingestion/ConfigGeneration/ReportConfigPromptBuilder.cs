@@ -18,8 +18,10 @@ public static class ReportConfigPromptBuilder
         - publisher: the asset manager or management company name
 
         STEP 2 — Identify the shared layout that applies to most or all funds in this report:
-        - reportDateRegex: C# regex matching the report as-of date line. Must be generic —
-          e.g. "As of \\w+ \\d{1,2},?\\s*\\d{4}" not "As of May 31, 2025"
+        - reportDatePattern: { regex, example } object.
+            regex: C# regex matching the report as-of date line. Must be generic —
+              e.g. "As of \\w+ \\d{1,2},?\\s*\\d{4}" not "As of May 31, 2025"
+            example: a representative date line from the document (e.g. "As of May 31, 2025").
         - tableConfig: describes how the Schedule of Investments table (or equivalent —
           Portfolio of Investments, Schedule of Portfolio Holdings, etc.) is laid out across
           the page width. It contains an ordered list of column groups, each covering a horizontal
@@ -78,29 +80,44 @@ public static class ReportConfigPromptBuilder
                 ] }
             ]}
         - securityTypePattern: identifies rows that declare the security type (e.g. "Common Stocks", "U.S. Government Obligations").
-            regex: C# regex matching the full row text. Wrap just the label in a capture group to strip noise
-              (e.g. "^([\w\s,]+?)\s*(?:[-–]\s*[\d.]+%.*)?$" strips a trailing percentage).
-            example: verbatim text of a representative row from the document.
-            isBold: true if these rows are typically bold.
-            spansFullWidth: true if the row spans the full page width.
+            regex: C# regex matching the full row text. ALWAYS wrap just the meaningful label in a
+              capture group (group 1) so the extraction engine can return the label alone.
+              The non-capturing suffix must cover all dash variants (hyphen -, en-dash –, em-dash —):
+              e.g. "^Equity Securities\s*-\s*([\w\s]+?)\s*(?:[-–—]\s*[\d.]+%.*)?$"
+              or for a row that IS only the label: "^(Common Stocks|Preferred Stocks)\s*$"
+              Never write a regex without a capture group for this field — without one the full
+              row text (e.g. "Equity Securities - Common Stocks — 98.8%") is emitted verbatim.
+            example: the meaningful label only — omit trailing percentages, amounts, dashes, or any
+              numeric noise (e.g. "Common Stocks", not "Common Stocks — 98.8%").
             Set to null if security type is always in a dedicated column (fields → SecurityType).
         - sectorPattern: same structure for sector/sub-section header rows (e.g. "Technology", "Financial Services").
+            regex: ALWAYS wrap the sector label in a capture group (group 1), same rule as securityTypePattern.
+              Include all dash variants in any non-capturing suffix: [-–—].
+            example: the sector label only, no trailing percentages or numbers.
             Set to null if sector is always in a dedicated column or absent.
         - countryPattern: same structure for country header rows (e.g. "UNITED STATES", "United Kingdom").
+            regex: ALWAYS wrap the country name in a capture group (group 1), same rule as securityTypePattern.
+              Include all dash variants in any non-capturing suffix: [-–—].
+            example: the country name only, no trailing percentages or numbers.
             Set to null if country is always in a dedicated column (fields → Country) or absent.
-        - securityNameCleaningPattern: C# regex whose matches are removed from the raw security name
-          text to produce the clean display name. Use this to strip trailing noise that PDF extraction
-          leaves behind — dot leaders, long runs of dots, dashes, underscores, or similar fill
-          characters that appear between the name column and the numeric columns to the right.
-          The pattern must only remove characters that carry no meaning — it must never alter a name
-          that reads cleanly on its own. Express it as a single pattern applied with Replace(pattern, "").
-          Example for dot leaders: @"(\s*\.){2,}\s*$"
-          Set to null if security names in this report do not contain trailing noise.
-        - footnotePattern: C# regex matching footnote markers (e.g. "(1)", "†", "*"), or null
-        - subtotalRowPattern: C# regex matching subtotal/total rows to skip during extraction, or null.
-          Must be precise enough that it will never match a holding name — for example, anchor to the
-          full row text or require additional context (e.g. "^Total\s+(Investments|Assets|Portfolio)\b"
-          rather than "^Total\b" which would falsely match fund names like "Total Return Bond Fund").
+        - securityNameCleaningPattern: { regex, example } object, or null if names need no cleaning.
+            regex: C# regex whose matches are removed from the raw security name to produce the clean
+              display name. Use this to strip trailing noise that PDF extraction leaves behind —
+              dot leaders, long runs of dots, dashes, underscores, or similar fill characters
+              that appear between the name column and the numeric columns to the right.
+              The pattern must only remove characters that carry no meaning — it must never alter a
+              name that reads cleanly on its own. Express it as a single pattern applied with Replace(pattern, "").
+              Example for dot leaders: @"(\s*\.){2,}\s*$"
+            example: a representative raw security name from the document, before cleaning is applied.
+        - footnotePattern: { regex, example } object, or null.
+            regex: C# regex matching footnote markers appended to security names (e.g. "(1)", "†", "*").
+            example: a representative security name that carries a footnote marker.
+        - subtotalRowPattern: { regex, example } object, or null.
+            regex: C# regex matching subtotal/total rows to skip during extraction.
+              Must be precise enough that it will never match a holding name — for example, anchor to the
+              full row text or require additional context (e.g. "^Total\s+(Investments|Assets|Portfolio)\b"
+              rather than "^Total\b" which would falsely match fund names like "Total Return Bond Fund").
+            example: verbatim text of a representative subtotal or total row from the document.
         - currencySymbol: "$", "£", "€", etc.
         - negativeNotation: "Parentheses" or "Minus"
         - validationTolerance: fractional tolerance for market value sum checks (e.g. 0.02 for 2%)
@@ -108,20 +125,26 @@ public static class ReportConfigPromptBuilder
         STEP 3 — For each fund whose holdings section appears in this document, produce a fund entry:
         - fundId: lowercase hyphen-separated slug (omit generic words: fund, the, of, a)
         - displayName: full legal name as it appears in the document
-        - fundNameRegex: C# regex matching the fund name as it appears in headers
+        - fundNamePattern: { regex, example } object.
+            regex: C# regex matching the fund name as it appears in headers.
+            example: verbatim text of a representative fund name line from the document.
         - scheduleLocator:
-            startPattern: C# regex matching the line that begins this fund's holdings section,
-              specifically the text in the first cell of the first row in the table. Do not assumed
-              this will be matched against rows, it may be matched against all text on the page.
-            terminationPattern: C# regex matching the line that signals the end of this fund's holdings.
-              IMPORTANT — prefer structural labels over security names, in this order:
-                1. A total or subtotal row that appears after the last holding. This is the safest
-                   choice because it falls outside the holdings and will never exclude a row.
-                2. A section footer or annotation that follows the last holding.
-                3. Only as a last resort — if no structural label exists — use the last holding's name.
-                   In this case, flag it in issues with "terminationPattern uses a security name".
-              Never use a security name when a structural label is available — matching on a holding
-              name causes that holding to be excluded from extraction.
+            startPattern: { regex, example } object.
+              regex: C# regex matching the line that begins this fund's holdings section,
+                specifically the text in the first cell of the first row in the table. Do not assume
+                this will be matched against rows, it may be matched against all text on the page.
+              example: verbatim text of the line that starts the schedule.
+            terminationPattern: { regex, example } object, or null.
+              regex: C# regex matching the line that signals the end of this fund's holdings.
+                IMPORTANT — prefer structural labels over security names, in this order:
+                  1. A total or subtotal row that appears after the last holding. This is the safest
+                     choice because it falls outside the holdings and will never exclude a row.
+                  2. A section footer or annotation that follows the last holding.
+                  3. Only as a last resort — if no structural label exists — use the last holding's name.
+                     In this case, flag it in issues with "terminationPattern uses a security name".
+                Never use a security name when a structural label is available — matching on a holding
+                name causes that holding to be excluded from extraction.
+              example: verbatim text of the termination line.
             pageHint: the approximate page number where this fund's schedule begins (advisory only)
         - overrides: any reportLayout fields that differ for this specific fund. Omit fields that
           match the report-level layout. Use null (not omit) to explicitly clear a report-level value.

@@ -69,9 +69,9 @@ public sealed class HoldingExtractor(
 
     private static List<PageStructure> FindSchedulePages(PdfStructure structure, ScheduleLocator locator)
     {
-        var startRegex = new Regex(locator.StartPattern, RegexOptions.IgnoreCase);
-        var endRegex = locator.TerminationPattern is not null
-            ? new Regex(locator.TerminationPattern, RegexOptions.IgnoreCase)
+        var startRegex = new Regex(locator.StartPattern.Regex!, RegexOptions.IgnoreCase);
+        var endRegex = locator.TerminationPattern?.Regex is not null
+            ? new Regex(locator.TerminationPattern.Regex!, RegexOptions.IgnoreCase)
             : null;
 
         var result = new List<PageStructure>();
@@ -120,14 +120,14 @@ public sealed class HoldingExtractor(
 
     private DateOnly ExtractReportDate(PdfStructure structure, ReportLayoutConfig layout)
     {
-        if (layout.ReportDateRegex is null)
+        if (layout.ReportDatePattern?.Regex is null)
         {
             log.LogWarning("Failed to extract report date, defaulting to today");
             return DateOnly.FromDateTime(DateTime.UtcNow);
         }
 
         var fullText = string.Join(" ", structure.Pages.SelectMany(p => p.Text));
-        var match = Regex.Match(fullText, layout.ReportDateRegex, RegexOptions.IgnoreCase);
+        var match = Regex.Match(fullText, layout.ReportDatePattern.Regex!, RegexOptions.IgnoreCase);
         if (!match.Success) return DateOnly.FromDateTime(DateTime.UtcNow);
 
         return DateOnly.TryParse(match.Value, out var date) ? date : DateOnly.FromDateTime(DateTime.UtcNow);

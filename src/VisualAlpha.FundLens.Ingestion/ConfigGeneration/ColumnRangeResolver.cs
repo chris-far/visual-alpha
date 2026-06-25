@@ -79,7 +79,8 @@ public sealed class ColumnRangeResolver(ILogger<ColumnRangeResolver> log) : ICol
             .Select((column, i) => ResolveColumn(column, fundLines.Where(l => l.ColumnIndex == i).ToList(), fundId, i))
             .ToList();
 
-        return tableConfig with { ColumnGroups = resolvedColumnGroups };
+        var totalWidth = structure.Pages.Count > 0 ? structure.Pages.Max(p => p.Width) : (double?)null;
+        return tableConfig with { ColumnGroups = resolvedColumnGroups, TotalWidth = totalWidth };
     }
 
     // Collects lines starting from the first line whose blocks contain the column header keys
@@ -88,8 +89,8 @@ public sealed class ColumnRangeResolver(ILogger<ColumnRangeResolver> log) : ICol
         List<PageStructure> allPages,
         ScheduleLocator locator)
     {
-        var endRegex = locator.TerminationPattern is { Length: > 0 }
-            ? new Regex(locator.TerminationPattern, RegexOptions.IgnoreCase)
+        var endRegex = locator.TerminationPattern?.Regex is { Length: > 0 }
+            ? new Regex(locator.TerminationPattern.Regex!, RegexOptions.IgnoreCase)
             : null;
 
         var lines   = new List<TextLine>();

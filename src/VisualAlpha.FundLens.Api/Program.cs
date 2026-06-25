@@ -5,6 +5,7 @@ using VisualAlpha.FundLens.Core.Interfaces;
 using VisualAlpha.FundLens.Extraction.Core;
 using VisualAlpha.FundLens.Extraction.Enrichment;
 using VisualAlpha.FundLens.Extraction.Strategies;
+using VisualAlpha.FundLens.Ingestion;
 using VisualAlpha.FundLens.Ingestion.ConfigGeneration;
 using VisualAlpha.FundLens.Ingestion.PreProcessing;
 using VisualAlpha.FundLens.Ingestion.Storage;
@@ -26,6 +27,7 @@ builder.Services.AddSingleton<IPdfPreProcessor, PdfPreProcessor>();
 builder.Services.Configure<CountryEnricherOptions>(builder.Configuration.GetSection(CountryEnricherOptions.SectionName));
 builder.Services.AddSingleton<ICountryEnricher, CountryEnricher>();
 builder.Services.AddSingleton<IReportConfigStore, FileSystemConfigStore>();
+builder.Services.AddSingleton<IReportOnboardingService, ReportOnboardingService>();
 
 // Extraction Strategies
 builder.Services.AddSingleton<IExtractionStrategy, ColumnBasedExtractionStrategy>();
@@ -50,5 +52,7 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseHttpLogging();
+app.UseDefaultFiles(); // serves index.html as default
+app.UseStaticFiles(); // serves wwwroot contents
 app.MapControllers();
 app.Run();
