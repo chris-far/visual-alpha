@@ -62,7 +62,10 @@
       "Example": "Basic Materials"
     },
     "CountryPattern": null,
-    "SecurityNameCleaningPattern": null,
+    "SecurityNameCleaningPattern": {
+      "Regex": "^\\*[,\\d]*\\s*",
+      "Example": "* RBC Bearings Inc."
+    },
     "FootnotePattern": {
       "Regex": "^[\\*\u2020\\d,\\.]\u002B\\s*|\\s*[\\*\u2020](?:,\\d\u002B)*$",
       "Example": "* RBC Bearings Inc."

@@ -52,7 +52,7 @@ function renderReportsTable(reports) {
       <td>${esc(r.displayName ?? r.reportId)}</td>
       <td>${r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '—'}</td>
       <td style="display:flex;gap:6px;justify-content:flex-end">
-        <button class="btn" onclick="event.stopPropagation();extractReport('${esc(r.reportId)}')">Extract</button>
+        <button class="btn" onclick="event.stopPropagation();extractReport('${esc(r.reportId)}')">Get Holdings</button>
         <button class="btn btn-danger-ghost" onclick="event.stopPropagation();deleteReport('${esc(r.reportId)}','${esc(r.displayName ?? r.reportId)}')">Delete</button>
       </td>
     </tr>`).join('');
@@ -766,11 +766,6 @@ function regexPatternRow(key, label, pattern, tooltip = null) {
     const labelHtml = tooltip
         ? `${esc(label)}<span class="field-hint" data-tooltip="${esc(tooltip)}"><i class="ti ti-info-circle" aria-hidden="true"></i></span>`
         : esc(label);
-    if (!pattern) return `
-    <div class="regex-row" data-key="${key}">
-        <div class="regex-label">${labelHtml}</div>
-        <span class="pattern-empty">—</span>
-    </div>`;
     return `
     <div class="regex-row" data-key="${key}">
         <div class="regex-label">${labelHtml}</div>
@@ -778,7 +773,7 @@ function regexPatternRow(key, label, pattern, tooltip = null) {
             <div class="pattern-view">
                 <button class="pattern-edit-btn" aria-label="Edit regex"><i class="ti ti-pencil" aria-hidden="true"></i></button>
                 <div class="pattern-view-body">
-                    ${pattern.example ? `<div class="pattern-example">${esc(pattern.example)}</div>` : ''}
+                    ${pattern?.example ? `<div class="pattern-example">${esc(pattern.example)}</div>` : '<span class="pattern-empty">—</span>'}
                 </div>
             </div>
             <div class="pattern-edit" hidden>
@@ -786,7 +781,7 @@ function regexPatternRow(key, label, pattern, tooltip = null) {
                 <div class="regex-input-wrap">
                     <span class="regex-delimiter">/</span>
                     <input class="regex-input" type="text" data-key="${key}"
-                           value="${esc(pattern.regex ?? '')}" placeholder="(no pattern)" />
+                           value="${esc(pattern?.regex ?? '')}" placeholder="(no pattern)" />
                     <span class="regex-delimiter">/</span>
                 </div>
             </div>
