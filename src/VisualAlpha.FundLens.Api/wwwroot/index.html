@@ -29,7 +29,7 @@
                 <i class="ti ti-settings" aria-hidden="true"></i> Config Editor
             </button>
             <button class="nav-item" data-tab="extract">
-                <i class="ti ti-upload" aria-hidden="true"></i> Extract
+                <i class="ti ti-upload" aria-hidden="true"></i> Extract Holdings
             </button>
         </nav>
     </aside>
@@ -62,7 +62,7 @@
                     <table>
                         <thead>
                         <tr>
-                            <th>Publisher</th><th>Report ID</th><th>Onboarded</th><th></th>
+                            <th>Publisher</th><th>Name</th><th>Onboarded</th><th></th>
                         </tr>
                         </thead>
                         <tbody id="reports-tbody">
@@ -78,6 +78,12 @@
         <section id="tab-onboarding" class="tab">
             <header class="topbar">
                 <h2>Onboarding</h2>
+                <div style="display:flex;gap:8px;align-items:center">
+                    <button class="btn" id="btn-cancel-onboarding" hidden>Cancel</button>
+                    <button class="btn primary" id="btn-review-onboarding" hidden>
+                        <i class="ti ti-settings" aria-hidden="true"></i> Review Config
+                    </button>
+                </div>
             </header>
             <div class="content">
                 <div class="panel" id="upload-panel">
@@ -131,12 +137,6 @@
                         </table>
                     </div>
                     <div class="table-footer" id="holdings-count"></div>
-                    <div class="onboarding-actions">
-                        <button class="btn" id="btn-cancel-onboarding">Cancel</button>
-                        <button class="btn primary" id="btn-review-onboarding">
-                            <i class="ti ti-settings" aria-hidden="true"></i> Review Config
-                        </button>
-                    </div>
                 </div>
             </div>
         </section>
@@ -144,12 +144,12 @@
         <!-- ══ EXTRACT ══ -->
         <section id="tab-extract" class="tab">
             <header class="topbar">
-                <h2>Extract</h2>
+                <h2>Extract Holdings</h2>
                 <button class="btn" id="ex-btn-clear" hidden>Clear</button>
             </header>
             <div class="content">
                 <div class="panel" id="ex-upload-panel">
-                    <div class="panel-header">Upload PDF for a Known Report</div>
+                    <div class="panel-header">Upload PDF for Onboareded Report</div>
                     <div class="drop-zone" id="ex-drop-zone">
                         <i class="ti ti-cloud-upload" aria-hidden="true"></i>
                         <p>Drag &amp; drop a PDF here, or</p>
@@ -182,7 +182,13 @@
         <!-- ══ CONFIG EDITOR ══ -->
         <section id="tab-config" class="tab">
             <header class="topbar">
-                <h2>Config Editor</h2>
+                <div style="display:flex;gap:12px;align-items:center">
+                    <h2>Config Editor</h2>
+                    <div class="toggle-group" id="config-view-toggle" hidden>
+                        <button class="toggle-btn active" id="btn-view-viz">UI</button>
+                        <button class="toggle-btn" id="btn-view-json">Source</button>
+                    </div>
+                </div>
                 <div style="display:flex;gap:8px;align-items:center">
                     <select id="config-report-select"></select>
                     <button class="btn" id="btn-cancel-config" hidden>Cancel</button>
@@ -195,40 +201,81 @@
                     <i class="ti ti-circle-check" aria-hidden="true"></i>
                     <span id="config-banner-text"></span>
                 </div>
-                <div class="panel">
+                <div class="panel" id="overview-panel" hidden>
                     <div class="panel-header">
-                        <span id="config-panel-title">Column Visualizer</span>
-                        <div class="toggle-group">
-                            <button class="toggle-btn active" id="btn-view-viz">Column Layout</button>
-                            <button class="toggle-btn" id="btn-view-json">Raw JSON</button>
+                        <div class="overview-name-field">
+                            <div class="pattern-view" id="overview-name-view">
+                                <button class="pattern-edit-btn" id="overview-name-edit-btn" aria-label="Edit name"><i class="ti ti-pencil" aria-hidden="true"></i></button>
+                                <span id="overview-panel-title"></span>
+                            </div>
+                            <div class="pattern-edit" id="overview-name-edit" hidden>
+                                <button class="pattern-done-btn" id="overview-name-done-btn" aria-label="Done"><i class="ti ti-check" aria-hidden="true"></i></button>
+                                <input class="overview-name-input" id="overview-name-input" type="text" placeholder="Display name…" />
+                            </div>
                         </div>
                     </div>
-                    <div id="config-viz-pane">
-                        <div class="config-viz" id="config-viz">
-                            <p class="empty">Select a report above to visualise its config.</p>
-                        </div>
-                    </div>
-                    <div id="config-json-pane" hidden>
-                        <textarea id="config-editor" spellcheck="false"
-                                  placeholder="Select a report to load its config…"></textarea>
-                    </div>
-                </div>
-                <!-- Funds table -->
-                <div class="panel" id="patterns-panel" hidden>
-                    <div class="panel-header">Funds</div>
-                    <table id="patterns-table">
+                    <table id="overview-table">
                         <thead>
-                        <tr><th class="fund-toggle-col"></th><th>Fund ID</th><th>Display Name</th></tr>
+                            <tr><th>Publisher</th><th>Report ID</th><th>Type</th><th>Onboarded</th></tr>
                         </thead>
-                        <tbody id="patterns-tbody"></tbody>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="ov-editable">
+                                        <div class="ov-view" id="ov-publisher-view">
+                                            <button class="pattern-edit-btn" id="ov-publisher-edit-btn" aria-label="Edit publisher"><i class="ti ti-pencil" aria-hidden="true"></i></button>
+                                            <span id="ov-publisher">—</span>
+                                        </div>
+                                        <div class="ov-edit" id="ov-publisher-edit-row" hidden>
+                                            <button class="pattern-done-btn" id="ov-publisher-done-btn" aria-label="Done"><i class="ti ti-check" aria-hidden="true"></i></button>
+                                            <input class="ov-edit-input" id="ov-publisher-input" type="text" placeholder="Publisher…" />
+                                        </div>
+                                    </div>
+                                </td>
+                                <td id="ov-id">—</td>
+                                <td id="ov-type">—</td>
+                                <td id="ov-created">—</td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
-                <!-- Regex pattern editor -->
-                <div class="panel" id="regex-panel" hidden>
-                    <div class="panel-header">Patterns</div>
-                    <div id="regex-editor-panel" class="regex-editor">
-                        <p class="empty">Select a report above to edit patterns.</p>
+                <div id="config-empty-state">
+                    <i class="ti ti-file-settings" aria-hidden="true"></i>
+                    <p>Select a report above to edit its config.</p>
+                </div>
+                <!-- Column Layout view -->
+                <div id="config-layout-pane" hidden>
+                    <div class="panel" id="viz-panel">
+                        <div class="panel-header">Column Visualizer</div>
+                        <div class="config-viz" id="config-viz"></div>
+                        <p class="viz-hint">
+                            <i class="ti ti-info-circle" aria-hidden="true"></i>
+                            Each band represents a column on the schedule of investments table. Drag the left or right edge to adjust its horizontal position on the page.
+                        </p>
                     </div>
+                    <!-- Funds table -->
+                    <div class="panel" id="patterns-panel" hidden>
+                        <div class="panel-header">Funds</div>
+                        <table id="patterns-table">
+                            <thead>
+                            <tr><th class="fund-toggle-col"></th><th>Fund ID</th><th>Display Name</th></tr>
+                            </thead>
+                            <tbody id="patterns-tbody"></tbody>
+                        </table>
+                    </div>
+                    <!-- Regex pattern editor -->
+                    <div class="panel" id="regex-panel" hidden>
+                        <div class="panel-header">Patterns</div>
+                        <div id="regex-editor-panel" class="regex-editor">
+                            <p class="empty">Select a report above to edit patterns.</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Raw JSON view -->
+                <div class="panel" id="config-json-panel" hidden>
+                    <div class="panel-header">Raw JSON</div>
+                    <textarea id="config-editor" spellcheck="false"
+                              placeholder="Select a report to load its config…"></textarea>
                 </div>
             </div>
         </section>

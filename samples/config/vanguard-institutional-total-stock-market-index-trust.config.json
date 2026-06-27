@@ -1,0 +1,108 @@
+{
+  "ReportId": "vanguard-institutional-total-stock-market-index-trust",
+  "ReportType": "SingleFund",
+  "Publisher": "Vanguard",
+  "DisplayName": "Vanguard Total Stock Market Index Trust",
+  "Version": 1,
+  "CreatedAt": "2026-06-27T07:53:25.502845Z",
+  "ReportLayout": {
+    "TableConfig": {
+      "ColumnGroups": [
+        {
+          "Fields": [
+            {
+              "Field": "SecurityName",
+              "HeaderText": null,
+              "IsHeaderTextVisible": false,
+              "Index": 0,
+              "LeftX": 11,
+              "RightX": 317
+            },
+            {
+              "Field": "Shares",
+              "HeaderText": "Shares",
+              "IsHeaderTextVisible": true,
+              "Index": 1,
+              "LeftX": 385,
+              "RightX": 446
+            },
+            {
+              "Field": "Cost",
+              "HeaderText": "Cost\n($000)",
+              "IsHeaderTextVisible": true,
+              "Index": 2,
+              "LeftX": 462,
+              "RightX": 515
+            },
+            {
+              "Field": "MarketValue",
+              "HeaderText": "Market\nValue\u2022\n($000)",
+              "IsHeaderTextVisible": true,
+              "Index": 3,
+              "LeftX": 530,
+              "RightX": 584
+            }
+          ],
+          "StartX": null,
+          "EndX": null
+        }
+      ],
+      "TotalWidth": null
+    },
+    "ReportDatePattern": {
+      "Regex": "(?:As of|December\\s\u002B31,?)\\s*\\d{4}",
+      "Example": "As of December 31, 2025"
+    },
+    "SecurityTypePattern": {
+      "Regex": "^(Common Stocks|Preferred Stocks|Rights|Temporary Cash Investments)(?:\\s*\\([\\d.]\u002B%\\))?\\s*$",
+      "Example": "Common Stocks"
+    },
+    "SectorPattern": {
+      "Regex": "^(Basic Materials|Consumer Discretionary|Consumer Staples|Energy|Financials|Health Care|Industrials|Real Estate|Technology|Telecommunications|Utilities)(?:\\s*\\([\\d.]\u002B%\\))?\\s*$",
+      "Example": "Basic Materials"
+    },
+    "CountryPattern": null,
+    "SecurityNameCleaningPattern": null,
+    "FootnotePattern": {
+      "Regex": "^[\\*\u2020\\d,\\.]\u002B\\s*|\\s*[\\*\u2020](?:,\\d\u002B)*$",
+      "Example": "* RBC Bearings Inc."
+    },
+    "SubtotalRowPattern": {
+      "Regex": "^(?:Total\\s\u002B(?:Common Stocks|Preferred Stocks|Rights|Investments|Temporary Cash Investments)|Total\\s\u002B(?:Assets|Liabilities|Net Assets)|Other Assets and Liabilities[\u2014\\-]Net|Net Assets)\\b",
+      "Example": "Total Common Stocks"
+    },
+    "CurrencySymbol": "$",
+    "NegativeNotation": "Parentheses",
+    "ValidationTolerance": 0.02
+  },
+  "Funds": [
+    {
+      "FundId": "vanguard-institutional-total-stock-market-index-trust",
+      "DisplayName": "Vanguard Fiduciary Trust Company Institutional Total Stock Market Index Trust",
+      "FundNamePattern": {
+        "Regex": "Vanguard\\s\u002BFiduciary\\s\u002BTrust\\s\u002BCompany\\s\u002B[\u2013\\-]?\\s*Institutional\\s\u002BTotal\\s\u002BStock\\s\u002BMarket\\s\u002BIndex\\s\u002BTrust",
+        "Example": "Vanguard Fiduciary Trust Company \u2013 Institutional Total Stock Market Index Trust"
+      },
+      "ScheduleLocator": {
+        "StartPattern": {
+          "Regex": "(?:Common Stocks\\s*\\([\\d.]\u002B%\\)|Schedule of Investments)",
+          "Example": "Common Stocks (99.5%)"
+        },
+        "TerminationPattern": {
+          "Regex": "^Total\\s\u002BCommon\\s\u002BStocks\\b",
+          "Example": "Total Common Stocks"
+        },
+        "PageHint": 2
+      },
+      "Overrides": null
+    }
+  ],
+  "Issues": [
+    "Security name column has no header text in the PDF table; identified from data content.",
+    "Footnote markers include both leading asterisks (*) and superscript-style numerals (1) appearing before or after security names; combined footnote regex may need tuning.",
+    "The \u0027Cost ($000)\u0027 and \u0027Market Value ($000)\u0027 headers span two lines in the PDF; headerText values approximate the joined text.",
+    "Sector header rows may occasionally appear mid-page without a percentage suffix; sectorPattern accounts for optional percentage.",
+    "terminationPattern targets \u0027Total Common Stocks\u0027 structural label which appears at end of holdings section on page 53."
+  ],
+  "ConfidenceScore": 0.93
+}

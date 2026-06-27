@@ -1,0 +1,104 @@
+{
+  "ReportId": "global-x-cybersecurity-etf",
+  "ReportType": "SingleFund",
+  "Publisher": "Mirae Asset",
+  "DisplayName": "Global X Cybersecurity ETF",
+  "Version": 1,
+  "CreatedAt": "2026-06-27T08:25:44.668489Z",
+  "ReportLayout": {
+    "TableConfig": {
+      "ColumnGroups": [
+        {
+          "Fields": [
+            {
+              "Field": "SecurityName",
+              "HeaderText": null,
+              "IsHeaderTextVisible": false,
+              "Index": 0,
+              "LeftX": 36,
+              "RightX": 223
+            },
+            {
+              "Field": "Shares",
+              "HeaderText": "Shares",
+              "IsHeaderTextVisible": true,
+              "Index": 1,
+              "LeftX": 237,
+              "RightX": 279
+            },
+            {
+              "Field": "MarketValue",
+              "HeaderText": "Value",
+              "IsHeaderTextVisible": true,
+              "Index": 2,
+              "LeftX": 311,
+              "RightX": 334
+            }
+          ],
+          "StartX": 36,
+          "EndX": 334
+        }
+      ],
+      "TotalWidth": 396
+    },
+    "ReportDatePattern": {
+      "Regex": "February\\s\u002B\\d{1,2},\\s*\\d{4}\\s*\\(Unaudited\\)",
+      "Example": "February 28, 2026 (Unaudited)"
+    },
+    "SecurityTypePattern": {
+      "Regex": "^(COMMON STOCK|U\\.S\\. TREASURY OBLIGATION|REPURCHASE AGREEMENTS?)\\s*(?:[-\u2013\u2014]\\s*[\\d.]\u002B%.*)?$",
+      "Example": "COMMON STOCK"
+    },
+    "SectorPattern": {
+      "Regex": "^(Information Technology)\\s*[-\u2013\u2014]\\s*[\\d.]\u002B%\\s*$",
+      "Example": "Information Technology"
+    },
+    "CountryPattern": {
+      "Regex": "^(CANADA|ISRAEL|JAPAN|SOUTH KOREA|UNITED KINGDOM|UNITED STATES)\\s*[-\u2013\u2014]\\s*[\\d.]\u002B%\\s*$",
+      "Example": "UNITED STATES"
+    },
+    "SecurityNameCleaningPattern": {
+      "Regex": "(\\s*\\.[\\s.]*\\*?\\s*\\$?)\\s*$",
+      "Example": "BlackBerry * ...................................................."
+    },
+    "FootnotePattern": {
+      "Regex": "\\s*\\*(?:\\(A\\))?\\s*$|\\s*\\(A\\)\\s*$",
+      "Example": "Check Point Software Technologies *"
+    },
+    "SubtotalRowPattern": {
+      "Regex": "^TOTAL\\s\u002B(?:ISRAEL|JAPAN|SOUTH KOREA|UNITED KINGDOM|UNITED STATES|COMMON STOCK|U\\.S\\. TREASURY OBLIGATION|REPURCHASE AGREEMENTS?|INVESTMENTS)\\b",
+      "Example": "TOTAL UNITED STATES"
+    },
+    "CurrencySymbol": "$",
+    "NegativeNotation": "Parentheses",
+    "ValidationTolerance": 0.02
+  },
+  "Funds": [
+    {
+      "FundId": "global-x-cybersecurity-etf",
+      "DisplayName": "Global X Cybersecurity ETF",
+      "FundNamePattern": {
+        "Regex": "Global X Cybersecurity ETF",
+        "Example": "Global X Cybersecurity ETF"
+      },
+      "ScheduleLocator": {
+        "StartPattern": {
+          "Regex": "COMMON STOCK\\s*[-\u2013\u2014]\\s*[\\d.]\u002B%",
+          "Example": "COMMON STOCK \u2014 99.7%"
+        },
+        "TerminationPattern": {
+          "Regex": "TOTAL COMMON STOCK",
+          "Example": "TOTAL INVESTMENTS \u2014 102.3%"
+        },
+        "PageHint": 1
+      },
+      "Overrides": null
+    }
+  ],
+  "Issues": [
+    "Face Amount column appears for U.S. Treasury Obligations and Repurchase Agreements sections instead of Shares \u2014 extractor should map that column to Principal for those rows.",
+    "Repurchase Agreement rows have multi-line narrative descriptions rather than simple security names; extraction may require special handling for those rows.",
+    "Footnote markers include combinations of * and (A) (e.g., \u0027*(A)\u0027) which the footnotePattern handles but edge cases may exist."
+  ],
+  "ConfidenceScore": 0.93
+}

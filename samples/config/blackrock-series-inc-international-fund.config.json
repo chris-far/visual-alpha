@@ -1,0 +1,143 @@
+{
+  "ReportId": "blackrock-series-inc-international-fund",
+  "ReportType": "SingleFund",
+  "Publisher": "BlackRock",
+  "DisplayName": "BlackRock International Fund",
+  "Version": 1,
+  "CreatedAt": "2026-06-27T08:18:42.674621Z",
+  "ReportLayout": {
+    "TableConfig": {
+      "ColumnGroups": [
+        {
+          "Fields": [
+            {
+              "Field": "SecurityName",
+              "HeaderText": "Security",
+              "IsHeaderTextVisible": true,
+              "Index": 0,
+              "LeftX": 17,
+              "RightX": 171
+            },
+            {
+              "Field": "Shares",
+              "HeaderText": "Shares",
+              "IsHeaderTextVisible": true,
+              "Index": 1,
+              "LeftX": 200,
+              "RightX": 230
+            },
+            {
+              "Field": "MarketValue",
+              "HeaderText": "Value",
+              "IsHeaderTextVisible": true,
+              "Index": 2,
+              "LeftX": 251,
+              "RightX": 285
+            }
+          ],
+          "StartX": 17,
+          "EndX": 285
+        },
+        {
+          "Fields": [
+            {
+              "Field": "SecurityName",
+              "HeaderText": "Security",
+              "IsHeaderTextVisible": true,
+              "Index": 0,
+              "LeftX": 307,
+              "RightX": 461
+            },
+            {
+              "Field": "Shares",
+              "HeaderText": "Shares",
+              "IsHeaderTextVisible": true,
+              "Index": 1,
+              "LeftX": 486,
+              "RightX": 519
+            },
+            {
+              "Field": "MarketValue",
+              "HeaderText": "Value",
+              "IsHeaderTextVisible": true,
+              "Index": 2,
+              "LeftX": 541,
+              "RightX": 574
+            }
+          ],
+          "StartX": 307,
+          "EndX": 574
+        }
+      ],
+      "TotalWidth": 594
+    },
+    "ReportDatePattern": {
+      "Regex": "(?:August|May|February|November)\\s\u002B\\d{1,2},\\s*\\d{4}",
+      "Example": "August 31, 2025"
+    },
+    "SecurityTypePattern": {
+      "Regex": "^(Common Stocks)\\s*$",
+      "Example": "Common Stocks"
+    },
+    "SectorPattern": null,
+    "CountryPattern": {
+      "Regex": "^([A-Za-z][A-Za-z\\s]\u002B?)\\s*[-\u2013\u2014]\\s*[\\d.]\u002B%\\s*$",
+      "Example": "Canada \u2014 6.5%"
+    },
+    "SecurityNameCleaningPattern": {
+      "Regex": "(\\s*\\.){2,}\\s*$",
+      "Example": "Teck Resources Ltd., Class B ......................"
+    },
+    "FootnotePattern": {
+      "Regex": "\\([a-z]\\)$",
+      "Example": "BlackRock Liquidity Funds, T-Fund, Institutional Shares(a)"
+    },
+    "SubtotalRowPattern": {
+      "Regex": "^Total\\s\u002B(?:Long-Term Investments|Short-Term Securities|Investments|Assets Less Liabilities|Net Assets)\\b",
+      "Example": "Total Long-Term Investments \u2014 99.5%"
+    },
+    "CurrencySymbol": "$",
+    "NegativeNotation": "Parentheses",
+    "ValidationTolerance": 0.02
+  },
+  "Funds": [
+    {
+      "FundId": "blackrock-international",
+      "DisplayName": "BlackRock International Fund",
+      "FundNamePattern": {
+        "Regex": "BlackRock International Fund",
+        "Example": "BlackRock International Fund"
+      },
+      "ScheduleLocator": {
+        "StartPattern": {
+          "Regex": "Common Stocks",
+          "Example": "Common Stocks"
+        },
+        "TerminationPattern": {
+          "Regex": "^Net Assets\\s*[-\u2013\u2014]\\s*100\\.0%",
+          "Example": "Net Assets \u2014 100.0%"
+        },
+        "PageHint": 2
+      },
+      "Overrides": {
+        "TableConfig": null,
+        "ReportDatePattern": null,
+        "SecurityTypePattern": null,
+        "SectorPattern": null,
+        "CountryPattern": null,
+        "SecurityNameCleaningPattern": null,
+        "FootnotePattern": null,
+        "SubtotalRowPattern": null,
+        "CurrencySymbol": null,
+        "NegativeNotation": null,
+        "ValidationTolerance": null
+      }
+    }
+  ],
+  "Issues": [
+    "The document uses a two-column layout for the Schedule of Investments; both column groups share the same Security/Shares/Value structure.",
+    "Country headers include trailing percentage allocations (e.g. \u0027Canada \u2014 6.5%\u0027); the countryPattern regex strips these to return only the country name.",
+    "The report covers a single fund (BlackRock International Fund) despite the series name \u0027BlackRock Series, Inc.\u0027 appearing on the cover."
+  ],
+  "ConfidenceScore": 0.92
+}

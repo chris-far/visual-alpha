@@ -1,0 +1,97 @@
+{
+  "ReportId": "bny-mellon-global-infrastructure-income-etf",
+  "ReportType": "SingleFund",
+  "Publisher": "BNY Mellon",
+  "DisplayName": "BNY Mellon Global Infrastructure Income ETF",
+  "Version": 1,
+  "CreatedAt": "2026-06-27T08:17:00.374857Z",
+  "ReportLayout": {
+    "TableConfig": {
+      "ColumnGroups": [
+        {
+          "Fields": [
+            {
+              "Field": "SecurityName",
+              "HeaderText": "Description",
+              "IsHeaderTextVisible": true,
+              "Index": 0,
+              "LeftX": 38,
+              "RightX": 167
+            },
+            {
+              "Field": "Shares",
+              "HeaderText": "Shares",
+              "IsHeaderTextVisible": true,
+              "Index": 1,
+              "LeftX": 470,
+              "RightX": 509
+            },
+            {
+              "Field": "MarketValue",
+              "HeaderText": "Value ($)",
+              "IsHeaderTextVisible": true,
+              "Index": 2,
+              "LeftX": 522,
+              "RightX": 569
+            }
+          ],
+          "StartX": 38,
+          "EndX": 569
+        }
+      ],
+      "TotalWidth": 612
+    },
+    "ReportDatePattern": {
+      "Regex": "\\w\u002B\\s\u002B\\d{1,2},\\s*\\d{4}\\s*\\(Unaudited\\)",
+      "Example": "January 31, 2026 (Unaudited)"
+    },
+    "SecurityTypePattern": {
+      "Regex": "^Equity Securities\\s*-\\s*(Common Stocks)\\s*(?:[-\u2013\u2014]\\s*[\\d.]\u002B%.*)?$",
+      "Example": "Common Stocks"
+    },
+    "SectorPattern": null,
+    "CountryPattern": {
+      "Regex": "^([A-Za-z][A-Za-z\\s]\u002B?)\\s*[-\u2013\u2014]\\s*[\\d.]\u002B%\\s*$",
+      "Example": "United States"
+    },
+    "SecurityNameCleaningPattern": null,
+    "FootnotePattern": {
+      "Regex": "\\(([a-z])\\)$",
+      "Example": "Healthpeak Properties, Inc.(a)"
+    },
+    "SubtotalRowPattern": {
+      "Regex": "^(?:Total\\s\u002B(?:Equity Securities\\s*-\\s*Common Stocks|Investments?|Investment Companies)|Investment Companies\\s*[-\u2013\u2014]|Registered Investment Companies\\s*[-\u2013\u2014]).*$",
+      "Example": "Total Equity Securities - Common Stocks"
+    },
+    "CurrencySymbol": "$",
+    "NegativeNotation": "Parentheses",
+    "ValidationTolerance": 0.02
+  },
+  "Funds": [
+    {
+      "FundId": "bny-mellon-global-infrastructure-income-etf",
+      "DisplayName": "BNY Mellon Global Infrastructure Income ETF",
+      "FundNamePattern": {
+        "Regex": "BNY Mellon Global Infrastructure Income ETF",
+        "Example": "BNY Mellon Global Infrastructure Income ETF"
+      },
+      "ScheduleLocator": {
+        "StartPattern": {
+          "Regex": "Equity Securities\\s*-\\s*Common Stocks\\s*[-\u2013\u2014]\\s*[\\d.]\u002B%",
+          "Example": "Equity Securities - Common Stocks \u2014 98.8%"
+        },
+        "TerminationPattern": {
+          "Regex": "^Total Investments\\s*\\(cost\\s*\\$[\\d,]\u002B\\)",
+          "Example": "Total Investments (cost $496,768,394)"
+        },
+        "PageHint": 1
+      },
+      "Overrides": null
+    }
+  ],
+  "Issues": [
+    "Investment Companies section (Dreyfus money market fund) follows common stocks; subtotalRowPattern may need tuning if extraction engine processes both sections together.",
+    "countryPattern uses a generic dash-percentage suffix; verify it does not accidentally match security names containing dashes followed by numbers."
+  ],
+  "ConfidenceScore": 0.95
+}

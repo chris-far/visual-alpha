@@ -7,6 +7,7 @@ public sealed record ReportConfig
     public required string ReportId { get; init; }
     public required ReportType ReportType { get; init; }
     public string? Publisher { get; init; }
+    public string? DisplayName { get; init; }
     public int Version { get; init; } = 1;
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
 

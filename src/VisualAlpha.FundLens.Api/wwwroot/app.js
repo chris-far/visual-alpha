@@ -49,11 +49,11 @@ function renderReportsTable(reports) {
     tbody.innerHTML = reports.map(r => `
     <tr class="clickable" onclick="openConfig('${esc(r.reportId)}')">
       <td>${esc(r.publisher ?? r.reportId)}</td>
-      <td>${esc(r.reportId)}</td>
-      <td>${r.createdAt ? new Date(r.createdAt).toLocaleDateString() : '—'}</td>
+      <td>${esc(r.displayName ?? r.reportId)}</td>
+      <td>${r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '—'}</td>
       <td style="display:flex;gap:6px;justify-content:flex-end">
         <button class="btn" onclick="event.stopPropagation();extractReport('${esc(r.reportId)}')">Extract</button>
-        <button class="btn btn-danger-ghost" onclick="event.stopPropagation();deleteReport('${esc(r.reportId)}')">Delete</button>
+        <button class="btn btn-danger-ghost" onclick="event.stopPropagation();deleteReport('${esc(r.reportId)}','${esc(r.displayName ?? r.reportId)}')">Delete</button>
       </td>
     </tr>`).join('');
 }
@@ -63,8 +63,8 @@ function extractReport(reportId) {
     loadExtractReports().then(() => { exReportSel.value = reportId; exReportId = reportId; });
 }
 
-async function deleteReport(reportId) {
-    if (!confirm(`Delete report "${reportId}"? This cannot be undone.`)) return;
+async function deleteReport(reportId, displayName) {
+    if (!confirm(`Delete "${displayName ?? reportId}"? This cannot be undone.`)) return;
     try {
         const res = await fetch(API + `/api/runs/reports/${encodeURIComponent(reportId)}`, { method: 'DELETE' });
         if (!res.ok) throw new Error(res.statusText);
@@ -140,6 +140,8 @@ async function runOnboarding() {
         document.getElementById('upload-panel').hidden = true;
         renderResults(result);
         resultsPanel.hidden = false;
+        document.getElementById('btn-cancel-onboarding').hidden = false;
+        document.getElementById('btn-review-onboarding').hidden = false;
     } catch (err) {
         setProgress(100, '');
         progressPanel.hidden = true;
@@ -163,6 +165,8 @@ function resetOnboardingPane() {
     document.getElementById('results-panel').hidden  = true;
     document.getElementById('progress-panel').hidden = true;
     document.getElementById('upload-panel').hidden   = false;
+    document.getElementById('btn-cancel-onboarding').hidden = true;
+    document.getElementById('btn-review-onboarding').hidden = true;
 }
 
 document.getElementById('btn-cancel-onboarding').addEventListener('click', resetOnboardingPane);
@@ -175,6 +179,8 @@ document.getElementById('btn-review-onboarding').addEventListener('click', () =>
     setFreshMode(true);
     const editor = document.getElementById('config-editor');
     editor.value = JSON.stringify(_freshConfig, null, 2);
+    document.getElementById('config-view-toggle').hidden = false;
+    renderOverviewPanel(_freshConfig);
     renderConfigViz(_freshConfig);
     renderRegexEditor(_freshConfig);
     renderFundsTable(_freshConfig.funds ?? []);
@@ -276,7 +282,7 @@ async function loadExtractReports() {
         configs.forEach(c => {
             const opt = document.createElement('option');
             opt.value = c.reportId;
-            opt.textContent = c.publisher ?? c.reportId;
+            opt.textContent = c.displayName ?? c.publisher ?? c.reportId;
             exReportSel.appendChild(opt);
         });
         if (prev && configs.some(c => c.reportId === prev)) exReportSel.value = prev;
@@ -473,11 +479,12 @@ document.getElementById('btn-view-viz').addEventListener('click',  () => switchC
 document.getElementById('btn-view-json').addEventListener('click', () => switchConfigView('json'));
 
 function switchConfigView(view) {
-    document.getElementById('config-viz-pane').hidden  = view !== 'viz';
-    document.getElementById('config-json-pane').hidden = view !== 'json';
+    document.getElementById('overview-panel').hidden      = view !== 'viz' || !_showOverview;
+    document.getElementById('config-empty-state').hidden  = true;
+    document.getElementById('config-layout-pane').hidden  = view !== 'viz';
+    document.getElementById('config-json-panel').hidden   = view !== 'json';
     document.getElementById('btn-view-viz').classList.toggle('active',  view === 'viz');
     document.getElementById('btn-view-json').classList.toggle('active', view === 'json');
-    document.getElementById('config-panel-title').textContent = view === 'viz' ? 'Column Visualizer' : 'Raw JSON Config';
 }
 async function loadConfigReports() {
     try {
@@ -488,7 +495,7 @@ async function loadConfigReports() {
         configs.forEach(c => {
             const opt = document.createElement('option');
             opt.value = c.reportId;
-            opt.textContent = c.publisher ?? c.reportId;
+            opt.textContent = c.displayName ?? c.publisher ?? c.reportId;
             sel.appendChild(opt);
         });
         if (prev && configs.some(c => c.reportId === prev)) sel.value = prev;
@@ -519,15 +526,75 @@ document.getElementById('btn-clear-config').addEventListener('click', clearConfi
 
 function clearConfigEditor() {
     _freshConfig = null;
+    _showOverview = false;
     setFreshMode(false);
     document.getElementById('config-editor').value = '';
-    document.getElementById('config-viz').innerHTML = '<p class="empty">Select a report above to visualise its config.</p>';
-    document.getElementById('patterns-panel').hidden = true;
-    document.getElementById('regex-panel').hidden = true;
-    document.getElementById('btn-clear-config').hidden = true;
+    document.getElementById('config-viz').innerHTML = '';
+    document.getElementById('config-empty-state').hidden = false;
+    document.getElementById('overview-panel').hidden     = true;
+    document.getElementById('config-layout-pane').hidden = true;
+    document.getElementById('config-json-panel').hidden  = true;
+    document.getElementById('config-view-toggle').hidden = true;
+    document.getElementById('patterns-panel').hidden     = true;
+    document.getElementById('regex-panel').hidden        = true;
+    document.getElementById('btn-clear-config').hidden   = true;
+    document.getElementById('btn-view-viz').classList.add('active');
+    document.getElementById('btn-view-json').classList.remove('active');
     document.getElementById('config-report-select').value = '';
     _vizConfig = null;
 }
+
+function renderOverviewPanel(config) {
+    const typeLabel = { SingleFund: 'Single Fund', MultiFund: 'Multi Fund' };
+    const name = config.displayName ?? config.reportId ?? '—';
+    document.getElementById('overview-panel-title').textContent = name;
+    document.getElementById('overview-name-input').value        = config.displayName ?? '';
+    document.getElementById('ov-id').textContent        = config.reportId ?? '—';
+    document.getElementById('ov-publisher').textContent = config.publisher ?? '—';
+    document.getElementById('ov-publisher-input').value = config.publisher ?? '';
+    document.getElementById('ov-type').textContent      = typeLabel[config.reportType] ?? config.reportType ?? '—';
+    document.getElementById('ov-created').textContent   = config.createdAt
+        ? new Date(config.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+        : '—';
+    _showOverview = true;
+    document.getElementById('overview-panel').hidden = false;
+}
+
+document.getElementById('ov-publisher-edit-btn').addEventListener('click', () => {
+    document.getElementById('ov-publisher-view').hidden     = true;
+    document.getElementById('ov-publisher-edit-row').hidden = false;
+    document.getElementById('ov-publisher-input').focus();
+});
+
+document.getElementById('ov-publisher-done-btn').addEventListener('click', () => {
+    const value = document.getElementById('ov-publisher-input').value.trim() || null;
+    document.getElementById('ov-publisher').textContent         = value ?? '—';
+    document.getElementById('ov-publisher-view').hidden         = false;
+    document.getElementById('ov-publisher-edit-row').hidden     = true;
+    try {
+        const config = JSON.parse(document.getElementById('config-editor').value);
+        config.publisher = value;
+        document.getElementById('config-editor').value = JSON.stringify(config, null, 2);
+    } catch { /* ignore mid-edit */ }
+});
+
+document.getElementById('overview-name-edit-btn').addEventListener('click', () => {
+    document.getElementById('overview-name-view').hidden = true;
+    document.getElementById('overview-name-edit').hidden = false;
+    document.getElementById('overview-name-input').focus();
+});
+
+document.getElementById('overview-name-done-btn').addEventListener('click', () => {
+    const value = document.getElementById('overview-name-input').value.trim() || null;
+    document.getElementById('overview-panel-title').textContent = value ?? '—';
+    document.getElementById('overview-name-view').hidden = false;
+    document.getElementById('overview-name-edit').hidden = true;
+    try {
+        const config = JSON.parse(document.getElementById('config-editor').value);
+        config.displayName = value;
+        document.getElementById('config-editor').value = JSON.stringify(config, null, 2);
+    } catch { /* ignore mid-edit */ }
+});
 
 async function loadConfig(reportId) {
     _freshConfig = null;
@@ -539,6 +606,8 @@ async function loadConfig(reportId) {
         document.getElementById('config-editor').value = JSON.stringify(config, null, 2);
         document.getElementById('btn-save-config').disabled = false;
         document.getElementById('btn-clear-config').hidden = false;
+        document.getElementById('config-view-toggle').hidden = false;
+        renderOverviewPanel(config);
         renderConfigViz(config);
         renderRegexEditor(config);
         renderFundsTable(config.funds ?? []);
@@ -549,10 +618,11 @@ async function loadConfig(reportId) {
 }
 
 // ── Column viz drag state (module-level, handlers wired once) ─
-let _vizConfig = null;
+let _vizConfig     = null;
+let _showOverview  = false;
 let _vizWidth  = 612;
 let _vizDrag   = null;
-const _bc      = ['band-left', 'band-right', 'band-mark'];
+const _bc      = ['band-left', 'band-right', 'band-mark', 'band-4', 'band-5', 'band-6', 'band-7', 'band-8'];
 
 document.addEventListener('mousemove', e => {
     if (!_vizDrag) return;
@@ -596,6 +666,9 @@ document.addEventListener('mouseup', () => {
 });
 
 function renderConfigViz(config) {
+    document.getElementById('config-empty-state').hidden = true;
+    document.getElementById('config-layout-pane').hidden = false;
+
     const viz    = document.getElementById('config-viz');
     const groups = config.reportLayout?.tableConfig?.columnGroups ?? [];
     const allFields = groups.flatMap(g => g.fields ?? []);
@@ -891,15 +964,16 @@ document.getElementById('btn-save-config').addEventListener('click', async () =>
     try {
         await apiFetch('/api/onboarding/save-config', { method: 'POST', body: JSON.stringify(parsed),
             headers: { 'Content-Type': 'application/json' } });
+        const displayName = parsed.displayName ?? parsed.DisplayName
+            ?? parsed.funds?.[0]?.displayName ?? parsed.Funds?.[0]?.DisplayName
+            ?? parsed.reportId ?? parsed.ReportId;
         if (_freshConfig) {
             clearConfigEditor();
             resetOnboardingPane();
             await Promise.all([loadConfigReports(), loadExtractReports(), loadDashboard()]);
             showTab('dashboard');
-            const displayName = parsed.Funds?.[0]?.DisplayName ?? parsed.funds?.[0]?.displayName ?? parsed.ReportId ?? parsed.reportId;
             showDashboardBanner(`${displayName} onboarded successfully.`);
         } else {
-            const displayName = parsed.Funds?.[0]?.DisplayName ?? parsed.funds?.[0]?.displayName ?? parsed.ReportId ?? parsed.reportId;
             showConfigBanner(`${displayName} updated successfully.`);
         }
     } catch (e) {

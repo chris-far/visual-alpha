@@ -1,0 +1,103 @@
+{
+  "ReportId": "bmo-private-diversified-yield-portfolio",
+  "ReportType": "SingleFund",
+  "Publisher": "BMO",
+  "DisplayName": "BMO Private Diversified Yield Portfolio",
+  "Version": 1,
+  "CreatedAt": "2026-06-27T08:43:09.764132Z",
+  "ReportLayout": {
+    "TableConfig": {
+      "ColumnGroups": [
+        {
+          "Fields": [
+            {
+              "Field": "SecurityName",
+              "HeaderText": "Security",
+              "IsHeaderTextVisible": true,
+              "Index": 0,
+              "LeftX": 24,
+              "RightX": 354
+            },
+            {
+              "Field": "PrincipalOrShares",
+              "HeaderText": "Number of Shares or Units",
+              "IsHeaderTextVisible": true,
+              "Index": 1,
+              "LeftX": 384,
+              "RightX": 448
+            },
+            {
+              "Field": "Cost",
+              "HeaderText": "Cost\u002B",
+              "IsHeaderTextVisible": true,
+              "Index": 2,
+              "LeftX": 470,
+              "RightX": 514
+            },
+            {
+              "Field": "MarketValue",
+              "HeaderText": "Fair Value",
+              "IsHeaderTextVisible": true,
+              "Index": 3,
+              "LeftX": 533,
+              "RightX": 585
+            }
+          ],
+          "StartX": null,
+          "EndX": null
+        }
+      ],
+      "TotalWidth": null
+    },
+    "ReportDatePattern": {
+      "Regex": "(?:As at\\s\u002B)?December\\s\u002B31[,]?\\s*\\d{4}",
+      "Example": "December 31, 2025"
+    },
+    "SecurityTypePattern": {
+      "Regex": "^(Money Market Investments|Equities)\\s*(?:[-\u2013\u2014]\\s*[\\d.]\u002B%.*)?$",
+      "Example": "Equities"
+    },
+    "SectorPattern": {
+      "Regex": "^(Communication Services|Consumer Discretionary|Consumer Staples|Energy|Financials|Industrials|Information Technology|Materials|Real Estate|Utilities|Federal)\\s*(?:[-\u2013\u2014]\\s*[\\d.]\u002B%.*)?$",
+      "Example": "Financials"
+    },
+    "CountryPattern": null,
+    "SecurityNameCleaningPattern": null,
+    "FootnotePattern": null,
+    "SubtotalRowPattern": {
+      "Regex": "^(?:Total\\s\u002B(?:Money Market Investments|Equities|Investment Portfolio|Investments)|Other Assets Less Liabilities|NET ASSETS ATTRIBUTABLE TO HOLDERS OF REDEEMABLE UNITS)\\s*[-\u2013\u2014]?\\s*[\\d.]\u002B%?.*$",
+      "Example": "Total Money Market Investments \u2014 0.9%"
+    },
+    "CurrencySymbol": "$",
+    "NegativeNotation": "Parentheses",
+    "ValidationTolerance": 0.02
+  },
+  "Funds": [
+    {
+      "FundId": "bmo-private-diversified-yield",
+      "DisplayName": "BMO Private Diversified Yield Portfolio",
+      "FundNamePattern": {
+        "Regex": "BMO Private Diversified Yield Portfolio",
+        "Example": "BMO Private Diversified Yield Portfolio"
+      },
+      "ScheduleLocator": {
+        "StartPattern": {
+          "Regex": "SCHEDULE OF INVESTMENT PORTFOLIO",
+          "Example": "SCHEDULE OF INVESTMENT PORTFOLIO"
+        },
+        "TerminationPattern": {
+          "Regex": "^NET ASSETS ATTRIBUTABLE TO HOLDERS OF REDEEMABLE UNITS\\s*[-\u2013\u2014]\\s*100\\.0%",
+          "Example": "NET ASSETS ATTRIBUTABLE TO HOLDERS OF REDEEMABLE UNITS \u2014 100.0%"
+        },
+        "PageHint": 9
+      },
+      "Overrides": null
+    }
+  ],
+  "Issues": [
+    "Money Market section uses Par Value column header instead of \u0027Number of Shares or Units\u0027; extraction may need to handle both column header variants for PrincipalOrShares.",
+    "The schedule spans two pages with a \u0027(cont\u0027d)\u0027 header on page 10; startPattern should match only the first occurrence to avoid double-counting.",
+    "Cost column header includes a superscript \u0027\u002B\u0027 footnote marker (Cost\u002B); regex or header matching should account for this variant."
+  ],
+  "ConfidenceScore": 0.93
+}

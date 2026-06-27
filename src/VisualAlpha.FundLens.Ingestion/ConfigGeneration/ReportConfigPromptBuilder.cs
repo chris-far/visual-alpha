@@ -14,6 +14,9 @@ public static class ReportConfigPromptBuilder
         - reportId: lowercase hyphen-separated slug identifying this report family across all periods
           (e.g. "acme-global-equity"). Never include dates, quarters, or years — the same reportId
           must apply to January's report and December's report of the same fund/series.
+        - displayName: the human-readable name of this report or fund series as it appears on the
+          cover or header. For a single-fund report use the fund's full legal name. For a
+          multi-fund report use the umbrella/series name.
         - reportType: "SingleFund" or "MultiFund"
         - publisher: the asset manager or management company name
 
@@ -169,6 +172,7 @@ public static class ReportConfigPromptBuilder
         Return ONLY valid JSON with this exact top-level shape — no preamble, no markdown fences:
         {
           "reportId": "...",
+          "displayName": "...",
           "reportType": "...",
           "publisher": "...",
           "version": 1,

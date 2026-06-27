@@ -1,0 +1,94 @@
+{
+  "ReportId": "vanguard-total-world-bond-etf",
+  "ReportType": "SingleFund",
+  "Publisher": "Vanguard",
+  "DisplayName": "Vanguard\u00AE Total World Bond ETF",
+  "Version": 1,
+  "CreatedAt": "2026-06-27T06:49:18.464951Z",
+  "ReportLayout": {
+    "TableConfig": {
+      "ColumnGroups": [
+        {
+          "Fields": [
+            {
+              "Field": "SecurityName",
+              "HeaderText": null,
+              "IsHeaderTextVisible": false,
+              "Index": 0,
+              "LeftX": 35,
+              "RightX": 228
+            },
+            {
+              "Field": "Shares",
+              "HeaderText": "Shares",
+              "IsHeaderTextVisible": true,
+              "Index": 1,
+              "LeftX": 484,
+              "RightX": 525
+            },
+            {
+              "Field": "MarketValue",
+              "HeaderText": "Market Value ($000)",
+              "IsHeaderTextVisible": true,
+              "Index": 2,
+              "LeftX": 541,
+              "RightX": 571
+            }
+          ],
+          "StartX": 35,
+          "EndX": 571
+        }
+      ],
+      "TotalWidth": 612
+    },
+    "ReportDatePattern": {
+      "Regex": "As of \\w\u002B \\d{1,2},?\\s*\\d{4}",
+      "Example": "As of May 31, 2025"
+    },
+    "SecurityTypePattern": {
+      "Regex": "^((?:U\\.S\\.|International)\\s\u002BBond Fund|Money Market Fund|Investment Companies|Temporary Cash Investments)\\s*(?:\\([\\d.]\u002B%\\))?\\s*$",
+      "Example": "U.S. Bond Fund"
+    },
+    "SectorPattern": null,
+    "CountryPattern": null,
+    "SecurityNameCleaningPattern": null,
+    "FootnotePattern": {
+      "Regex": "^\\d\u002B\\s\u002B",
+      "Example": "1 Vanguard Market Liquidity Fund, 4.342%"
+    },
+    "SubtotalRowPattern": {
+      "Regex": "^(?:Total Investment Companies|Total Investments|Total|Other Assets and Liabilities[\u2014\\-\u2013]Net|Net Assets)\\b",
+      "Example": "Total Investment Companies (Cost $1,315,994)"
+    },
+    "CurrencySymbol": "$",
+    "NegativeNotation": "Parentheses",
+    "ValidationTolerance": 0.02
+  },
+  "Funds": [
+    {
+      "FundId": "vanguard-total-world-bond-etf",
+      "DisplayName": "Vanguard\u00AE Total World Bond ETF",
+      "FundNamePattern": {
+        "Regex": "Vanguard[\u00AE\\s]\u002BTotal World Bond ETF",
+        "Example": "Vanguard\u00AE Total World Bond ETF"
+      },
+      "ScheduleLocator": {
+        "StartPattern": {
+          "Regex": "Investment Companies\\s*\\(\\d\u002B\\.\\d\u002B%\\)",
+          "Example": "Investment Companies (100.0%)"
+        },
+        "TerminationPattern": {
+          "Regex": "^Net Assets\\s*\\(\\d\u002B%\\)",
+          "Example": "Net Assets (100%)"
+        },
+        "PageHint": 1
+      },
+      "Overrides": null
+    }
+  ],
+  "Issues": [
+    "Document contains a very small holdings table with only two ETF holdings and one money market fund; securityTypePattern doubles as section headers rather than instrument-type rows.",
+    "footnotePattern strips leading numeric footnote markers from security names; verify this does not incorrectly strip legitimate numeric prefixes if holdings expand in future editions."
+  ],
+  "ConfidenceScore": 0.92
+}
