@@ -8,14 +8,17 @@ namespace VisualAlpha.FundLens.Api.Controllers;
 [Route("api/onboarding")]
 public sealed class OnboardingController(
     IReportOnboardingService onboardingService,
-    IReportConfigStore configStore) : ControllerBase
+    IReportConfigStore configStore,
+    IValidationRunner validator) : ControllerBase
 {
     [HttpPost("onboard")]
     public async Task<IActionResult> Onboard(IFormFile pdf)
     {
         await using var stream = pdf.OpenReadStream();
         var result = await onboardingService.OnboardAsync(stream);
-        return Ok(new { report = result.Report, extractions = result.Extractions });
+        var validations = await Task.WhenAll(result.Extractions.Select(validator.RunAsync));
+        var paired = result.Extractions.Zip(validations, (e, v) => new { extraction = e, validation = v });
+        return Ok(new { report = result.Report, extractions = paired });
     }
 
     /// <summary>

@@ -4,7 +4,7 @@
   "Publisher": "Mirae Asset",
   "DisplayName": "Global X Cybersecurity ETF",
   "Version": 1,
-  "CreatedAt": "2026-06-27T08:25:44.668489Z",
+  "CreatedAt": "2026-06-28T01:45:52.563622Z",
   "ReportLayout": {
     "TableConfig": {
       "ColumnGroups": [
@@ -42,7 +42,7 @@
       "TotalWidth": 396
     },
     "ReportDatePattern": {
-      "Regex": "February\\s\u002B\\d{1,2},\\s*\\d{4}\\s*\\(Unaudited\\)",
+      "Regex": "\\w\u002B \\d{1,2},\\s*\\d{4}\\s*\\(Unaudited\\)",
       "Example": "February 28, 2026 (Unaudited)"
     },
     "SecurityTypePattern": {
@@ -55,19 +55,19 @@
     },
     "CountryPattern": {
       "Regex": "^(CANADA|ISRAEL|JAPAN|SOUTH KOREA|UNITED KINGDOM|UNITED STATES)\\s*[-\u2013\u2014]\\s*[\\d.]\u002B%\\s*$",
-      "Example": "UNITED STATES"
+      "Example": "CANADA"
     },
     "SecurityNameCleaningPattern": {
       "Regex": "(\\s*\\.[\\s.]*\\*?\\s*\\$?)\\s*$",
       "Example": "BlackBerry * ...................................................."
     },
     "FootnotePattern": {
-      "Regex": "\\s*\\*(?:\\(A\\))?\\s*$|\\s*\\(A\\)\\s*$",
+      "Regex": "\\s*\\*(?:\\(A\\))?\\s*$",
       "Example": "Check Point Software Technologies *"
     },
     "SubtotalRowPattern": {
-      "Regex": "^TOTAL\\s\u002B(?:ISRAEL|JAPAN|SOUTH KOREA|UNITED KINGDOM|UNITED STATES|COMMON STOCK|U\\.S\\. TREASURY OBLIGATION|REPURCHASE AGREEMENTS?|INVESTMENTS)\\b",
-      "Example": "TOTAL UNITED STATES"
+      "Regex": "^TOTAL\\s\u002B(?:ISRAEL|JAPAN|UNITED STATES|COMMON STOCK|U\\.S\\. TREASURY OBLIGATION|REPURCHASE AGREEMENTS|INVESTMENTS)\\b",
+      "Example": "TOTAL ISRAEL"
     },
     "CurrencySymbol": "$",
     "NegativeNotation": "Parentheses",
@@ -96,9 +96,9 @@
     }
   ],
   "Issues": [
-    "Face Amount column appears for U.S. Treasury Obligations and Repurchase Agreements sections instead of Shares \u2014 extractor should map that column to Principal for those rows.",
-    "Repurchase Agreement rows have multi-line narrative descriptions rather than simple security names; extraction may require special handling for those rows.",
-    "Footnote markers include combinations of * and (A) (e.g., \u0027*(A)\u0027) which the footnotePattern handles but edge cases may exist."
+    "Footnote markers include both \u0027*\u0027 and \u0027*(A)\u0027 patterns; the footnotePattern regex may need adjustment if additional footnote variants appear in future reports.",
+    "Repurchase Agreement rows use \u0027Face Amount\u0027 as the quantity column header rather than \u0027Shares\u0027; extraction may require column header switching for that section.",
+    "The sectorPattern requires a trailing percentage; if future editions omit the percentage the pattern will not match."
   ],
-  "ConfidenceScore": 0.93
+  "ConfidenceScore": 0.95
 }

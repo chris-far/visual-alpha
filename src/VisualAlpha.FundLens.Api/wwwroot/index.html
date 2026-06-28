@@ -109,35 +109,8 @@
                     <p class="progress-status" id="progress-status">Ingesting PDF…</p>
                 </div>
 
-                <!-- Results (hidden until done) -->
-                <div class="panel" id="results-panel" hidden>
-                    <div class="panel-header">
-                        Extracted Holdings
-                        <div style="display:flex;gap:8px">
-                            <button class="btn" id="btn-dl-json">Download JSON</button>
-                            <button class="btn" id="btn-dl-csv">Download CSV</button>
-                        </div>
-                    </div>
-                    <!-- Validation banner -->
-                    <div id="validation-banner" hidden></div>
-                    <div class="search-bar">
-                        <i class="ti ti-search" aria-hidden="true"></i>
-                        <input type="text" id="holdings-search" placeholder="Filter by name, sector, country…" />
-                    </div>
-                    <div class="table-scroll holdings-scroll">
-                        <table id="holdings-table">
-                            <thead>
-                            <tr>
-                                <th>Security name</th><th>Type</th><th>Sector</th>
-                                <th>Country</th><th>Shares</th><th>Principal</th>
-                                <th class="num">Market value</th>
-                            </tr>
-                            </thead>
-                            <tbody id="holdings-tbody"></tbody>
-                        </table>
-                    </div>
-                    <div class="table-footer" id="holdings-count"></div>
-                </div>
+                <!-- Results (hidden until done, populated dynamically) -->
+                <div id="ob-results-container" hidden></div>
             </div>
         </section>
 
@@ -268,6 +241,21 @@
                         <div class="panel-header">Patterns</div>
                         <div id="regex-editor-panel" class="regex-editor">
                             <p class="empty">Select a report above to edit patterns.</p>
+                        </div>
+                    </div>
+                    <!-- Issues (only shown when config has issues) -->
+                    <div class="panel" id="issues-panel" hidden>
+                        <div class="panel-header issues-toggle" style="cursor:pointer;user-select:none">
+                            Potential Issues
+                            <i class="ti ti-chevron-down"></i>
+                        </div>
+                        <div class="issues-body">
+                            <div class="table-scroll">
+                                <table>
+                                    <thead><tr><th style="width:32px"></th><th>Message</th></tr></thead>
+                                    <tbody id="issues-tbody"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>

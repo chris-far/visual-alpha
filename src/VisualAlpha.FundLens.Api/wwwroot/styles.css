@@ -136,7 +136,7 @@ html, body { height: 100%; font-family: var(--font); background: var(--bg-page);
 /* ── Content area ───────────────────────────────────────────── */
 .content { padding: 20px; display: flex; flex-direction: column; gap: 16px; flex: 1; min-height: 0; overflow-y: auto; }
 .content > * { flex-shrink: 0; }
-#ex-results-container { display: flex; flex-direction: column; gap: 16px; }
+#ex-results-container, #ob-results-container { display: flex; flex-direction: column; gap: 16px; }
 #config-layout-pane   { display: flex; flex-direction: column; gap: 16px; }
 #config-empty-state   { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; font-size: 13px; color: var(--text-secondary); }
 #config-empty-state i { font-size: 36px; color: var(--text-hint); }

@@ -114,10 +114,10 @@ async function runOnboarding() {
     btnOnboarding.disabled = true;
 
     // Show progress
-    const progressPanel = document.getElementById('progress-panel');
-    const resultsPanel  = document.getElementById('results-panel');
-    progressPanel.hidden = false;
-    resultsPanel.hidden  = true;
+    const progressPanel  = document.getElementById('progress-panel');
+    const resultsContainer = document.getElementById('ob-results-container');
+    progressPanel.hidden   = false;
+    resultsContainer.hidden = true;
     setProgress(15, 'Ingesting PDF…');
 
     const formData = new FormData();
@@ -134,12 +134,12 @@ async function runOnboarding() {
         await delay(300);
 
         extractResult          = result;
-        allHoldings            = result.extractions?.flatMap(e => e.holdings) ?? [];
+        allHoldings            = result.extractions?.flatMap(p => (p.extraction ?? p).holdings) ?? [];
         _lastOnboardingReport  = result.report ?? null;
         progressPanel.hidden = true;
         document.getElementById('upload-panel').hidden = true;
-        renderResults(result);
-        resultsPanel.hidden = false;
+        renderResults(result, resultsContainer);
+        resultsContainer.hidden = false;
         document.getElementById('btn-cancel-onboarding').hidden = false;
         document.getElementById('btn-review-onboarding').hidden = false;
     } catch (err) {
@@ -162,7 +162,7 @@ function resetOnboardingPane() {
     document.getElementById('drop-filename').textContent = '';
     fileInput.value = '';
     btnOnboarding.disabled = true;
-    document.getElementById('results-panel').hidden  = true;
+    document.getElementById('ob-results-container').hidden = true;
     document.getElementById('progress-panel').hidden = true;
     document.getElementById('upload-panel').hidden   = false;
     document.getElementById('btn-cancel-onboarding').hidden = true;
@@ -181,35 +181,117 @@ document.getElementById('btn-review-onboarding').addEventListener('click', () =>
     editor.value = JSON.stringify(_freshConfig, null, 2);
     document.getElementById('config-view-toggle').hidden = false;
     renderOverviewPanel(_freshConfig);
+    renderIssuesPanel(_freshConfig);
     renderConfigViz(_freshConfig);
     renderRegexEditor(_freshConfig);
     renderFundsTable(_freshConfig.funds ?? []);
 });
 
-function renderResults(result) {
-    // Validation banner — synthesised from ExtractionResult array
-    const banner = document.getElementById('validation-banner');
-    const extractions = result.extractions ?? [];
-    const allWarnings = extractions.flatMap(e => e.warnings ?? []);
+function renderResults(result, container) {
+    container.innerHTML = '';
+
+    const paired      = result.extractions ?? [];
+    const extractions = paired.map(p => p.extraction ?? p);
     const failed      = extractions.filter(e => e.status === 'Failed');
-    const errors      = failed.map(e => e.errorMessage).filter(Boolean);
-    banner.hidden = false;
-    if (failed.length) {
-        banner.className = 'validation-banner fail';
-        banner.innerHTML = `<i class="ti ti-circle-x"></i> Extraction failed: ${errors.map(esc).join('; ') || 'Unknown error'}`;
-    } else if (allWarnings.length) {
-        banner.className = 'validation-banner warn';
-        banner.innerHTML = `<i class="ti ti-alert-triangle"></i> ${allWarnings.length} warning(s): ${allWarnings.map(esc).join('; ')}`;
-    } else {
-        banner.className = 'validation-banner ok';
-        banner.innerHTML = '<i class="ti ti-circle-check"></i> All extractions succeeded.';
+    const failErrors  = failed.map(e => e.errorMessage).filter(Boolean);
+    const extWarnings = extractions.flatMap(e => (e.warnings ?? []).map(w => ({ severity: 'Warning', ruleName: 'Extraction', message: w, fieldName: null })));
+    const valFindings = paired.flatMap(p => p.validation?.findings ?? []);
+    const allFindings = [...valFindings, ...extWarnings];
+    const errors      = allFindings.filter(f => f.severity === 'Error' || f.severity === 'Critical');
+    const warnings    = allFindings.filter(f => f.severity === 'Warning');
+
+    const bannerCls  = failed.length || errors.length ? 'fail' : warnings.length ? 'warn' : 'ok';
+    const bannerIcon = failed.length || errors.length ? 'ti-circle-x' : warnings.length ? 'ti-alert-triangle' : 'ti-circle-check';
+    const bannerMsg  = failed.length
+        ? `Extraction failed: ${failErrors.map(esc).join('; ') || 'Unknown error'}`
+        : errors.length   ? `${errors.length} error(s) found — see findings below`
+        : warnings.length ? `${warnings.length} warning(s) — see findings below`
+        : 'All validation checks passed.';
+
+    // Summary panel
+    const summaryPanel = document.createElement('div');
+    summaryPanel.className = 'panel';
+    summaryPanel.innerHTML = `
+    <div class="panel-header">
+        Results — ${allHoldings.length} holding${allHoldings.length !== 1 ? 's' : ''}
+        <div style="display:flex;gap:8px">
+            <button class="btn" id="btn-dl-json">Download JSON</button>
+            <button class="btn" id="btn-dl-csv">Download CSV</button>
+        </div>
+    </div>
+    <div class="validation-banner ${bannerCls}" style="margin:12px 16px">
+        <i class="ti ${bannerIcon}"></i> ${bannerMsg}
+    </div>`;
+    summaryPanel.querySelector('#btn-dl-json').onclick = () => downloadJSON(result);
+    summaryPanel.querySelector('#btn-dl-csv').onclick  = () => downloadCSV(allHoldings);
+    container.appendChild(summaryPanel);
+
+    // Collapsible findings panel
+    if (allFindings.length) {
+        const sevBadge = s => {
+            const map = { Info: 'badge-new', Warning: 'badge-warn', Error: 'badge-fail', Critical: 'badge-fail' };
+            return `<span class="badge ${map[s] ?? 'badge-new'}">${esc(s)}</span>`;
+        };
+        const findingsPanel = document.createElement('div');
+        findingsPanel.className = 'panel';
+        findingsPanel.innerHTML = `
+        <div class="panel-header findings-toggle" style="cursor:pointer;user-select:none">
+            Validation findings (${allFindings.length})
+            <i class="ti ti-chevron-down"></i>
+        </div>
+        <div class="findings-body">
+            <div class="table-scroll">
+                <table>
+                    <thead><tr><th>Severity</th><th>Rule</th><th>Message</th><th>Field</th></tr></thead>
+                    <tbody>${allFindings.map(f => `
+                    <tr>
+                        <td>${sevBadge(f.severity)}</td>
+                        <td>${esc(f.ruleName ?? '—')}</td>
+                        <td>${esc(f.message ?? '—')}</td>
+                        <td>${esc(f.fieldName ?? '—')}</td>
+                    </tr>`).join('')}
+                    </tbody>
+                </table>
+            </div>
+        </div>`;
+        findingsPanel.querySelector('.findings-toggle').addEventListener('click', () => {
+            const body    = findingsPanel.querySelector('.findings-body');
+            const chevron = findingsPanel.querySelector('.ti');
+            body.hidden   = !body.hidden;
+            chevron.className = `ti ${body.hidden ? 'ti-chevron-right' : 'ti-chevron-down'}`;
+        });
+        container.appendChild(findingsPanel);
     }
 
+    // Holdings panel
+    const holdingsPanel = document.createElement('div');
+    holdingsPanel.className = 'panel';
+    holdingsPanel.innerHTML = `
+    <div class="panel-header">Holdings</div>
+    <div class="search-bar">
+        <i class="ti ti-search" aria-hidden="true"></i>
+        <input type="text" id="holdings-search" placeholder="Filter by name, sector, country…" />
+    </div>
+    <div class="table-scroll holdings-scroll">
+        <table id="holdings-table">
+            <thead><tr>
+                <th>Security name</th><th>Type</th><th>Sector</th>
+                <th>Country</th><th>Shares</th><th>Principal</th>
+                <th class="num">Market value</th>
+            </tr></thead>
+            <tbody id="holdings-tbody"></tbody>
+        </table>
+    </div>
+    <div class="table-footer" id="holdings-count"></div>`;
+    holdingsPanel.querySelector('#holdings-search').addEventListener('input', e => {
+        const q = e.target.value.toLowerCase();
+        const filtered = allHoldings.filter(h =>
+            [h.securityName, h.securityType, h.sector, h.country].some(v => v?.toLowerCase().includes(q))
+        );
+        renderHoldingsTable(filtered);
+    });
+    container.appendChild(holdingsPanel);
     renderHoldingsTable(allHoldings);
-
-    // Download buttons
-    document.getElementById('btn-dl-json').onclick = () => downloadJSON(result);
-    document.getElementById('btn-dl-csv').onclick  = () => downloadCSV(allHoldings);
 }
 
 function renderHoldingsTable(holdings) {
@@ -234,15 +316,6 @@ function renderHoldingsTable(holdings) {
     </tr>`).join('');
 }
 
-// Holdings search filter
-document.getElementById('holdings-search').addEventListener('input', e => {
-    const q = e.target.value.toLowerCase();
-    const filtered = allHoldings.filter(h =>
-        [h.securityName, h.securityType, h.sector, h.country]
-            .some(v => v?.toLowerCase().includes(q))
-    );
-    renderHoldingsTable(filtered);
-});
 
 function downloadJSON(result) {
     const blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' });
@@ -475,6 +548,8 @@ function renderExHoldingRows(holdings) {
 }
 
 // ── Config editor ────────────────────────────────────────────
+let _hasIssues = false;
+
 document.getElementById('btn-view-viz').addEventListener('click',  () => switchConfigView('viz'));
 document.getElementById('btn-view-json').addEventListener('click', () => switchConfigView('json'));
 
@@ -482,6 +557,7 @@ function switchConfigView(view) {
     document.getElementById('overview-panel').hidden      = view !== 'viz' || !_showOverview;
     document.getElementById('config-empty-state').hidden  = true;
     document.getElementById('config-layout-pane').hidden  = view !== 'viz';
+    document.getElementById('issues-panel').hidden        = view !== 'viz' || !_hasIssues;
     document.getElementById('config-json-panel').hidden   = view !== 'json';
     document.getElementById('btn-view-viz').classList.toggle('active',  view === 'viz');
     document.getElementById('btn-view-json').classList.toggle('active', view === 'json');
@@ -533,11 +609,13 @@ function clearConfigEditor() {
     document.getElementById('config-empty-state').hidden = false;
     document.getElementById('overview-panel').hidden     = true;
     document.getElementById('config-layout-pane').hidden = true;
+    document.getElementById('issues-panel').hidden       = true;
     document.getElementById('config-json-panel').hidden  = true;
     document.getElementById('config-view-toggle').hidden = true;
     document.getElementById('patterns-panel').hidden     = true;
     document.getElementById('regex-panel').hidden        = true;
     document.getElementById('btn-clear-config').hidden   = true;
+    _hasIssues = false;
     document.getElementById('btn-view-viz').classList.add('active');
     document.getElementById('btn-view-json').classList.remove('active');
     document.getElementById('config-report-select').value = '';
@@ -608,6 +686,7 @@ async function loadConfig(reportId) {
         document.getElementById('btn-clear-config').hidden = false;
         document.getElementById('config-view-toggle').hidden = false;
         renderOverviewPanel(config);
+        renderIssuesPanel(config);
         renderConfigViz(config);
         renderRegexEditor(config);
         renderFundsTable(config.funds ?? []);
@@ -664,6 +743,29 @@ document.addEventListener('mouseup', () => {
         document.getElementById('config-editor').value = JSON.stringify(current, null, 2);
     } catch { /* ignore */ }
 });
+
+function renderIssuesPanel(config) {
+    const issues = config.issues ?? config.Issues ?? [];
+    const panel  = document.getElementById('issues-panel');
+    if (!issues.length) {
+        panel.hidden = true;
+        _hasIssues = false;
+        return;
+    }
+    _hasIssues = true;
+    document.getElementById('issues-tbody').innerHTML = issues.map(msg => `
+    <tr>
+        <td><i class="ti ti-alert-triangle" style="color:var(--text-hint);font-size:14px"></i></td>
+        <td>${esc(msg)}</td>
+    </tr>`).join('');
+    panel.querySelector('.issues-toggle').addEventListener('click', () => {
+        const body    = panel.querySelector('.issues-body');
+        const chevron = panel.querySelector('.issues-toggle .ti');
+        body.hidden   = !body.hidden;
+        chevron.className = `ti ${body.hidden ? 'ti-chevron-right' : 'ti-chevron-down'}`;
+    });
+    panel.hidden = false;
+}
 
 function renderConfigViz(config) {
     document.getElementById('config-empty-state').hidden = true;
