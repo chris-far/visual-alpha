@@ -744,6 +744,14 @@ document.addEventListener('mouseup', () => {
     } catch { /* ignore */ }
 });
 
+document.getElementById('issues-panel').querySelector('.issues-toggle').addEventListener('click', () => {
+    const panel   = document.getElementById('issues-panel');
+    const body    = panel.querySelector('.issues-body');
+    const chevron = panel.querySelector('.issues-toggle .ti');
+    body.hidden   = !body.hidden;
+    chevron.className = `ti ${body.hidden ? 'ti-chevron-right' : 'ti-chevron-down'}`;
+});
+
 function renderIssuesPanel(config) {
     const issues = config.issues ?? config.Issues ?? [];
     const panel  = document.getElementById('issues-panel');
@@ -758,12 +766,8 @@ function renderIssuesPanel(config) {
         <td><i class="ti ti-alert-triangle" style="color:var(--text-hint);font-size:14px"></i></td>
         <td>${esc(msg)}</td>
     </tr>`).join('');
-    panel.querySelector('.issues-toggle').addEventListener('click', () => {
-        const body    = panel.querySelector('.issues-body');
-        const chevron = panel.querySelector('.issues-toggle .ti');
-        body.hidden   = !body.hidden;
-        chevron.className = `ti ${body.hidden ? 'ti-chevron-right' : 'ti-chevron-down'}`;
-    });
+    panel.querySelector('.issues-body').hidden = false;
+    panel.querySelector('.issues-toggle .ti').className = 'ti ti-chevron-down';
     panel.hidden = false;
 }
 
